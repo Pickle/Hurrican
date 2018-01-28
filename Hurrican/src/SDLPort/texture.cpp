@@ -108,7 +108,12 @@ bool SDL_LoadTexture( const string &path, const string &filename,
 #if defined(USE_PVRTC)
     if ( DirectGraphics.SupportedPVRTC )
     {
-        fullpath = path + "/pvr/" + filename_sans_ext + ".pvr";
+        fullpath = path + "/pvr/" + filename + ".pvr";
+
+#if defined(_DEBUG)
+        Protokoll.WriteText( false, "Using PVR looking for %s\n", fullpath.c_str() );
+#endif
+
         success = loadImagePVRTC( image, fullpath ) &&
                   load_texture ( image, th.tex );
 
@@ -290,12 +295,16 @@ bool loadImagePVRTC( image_t& image, const string &fullpath )
         {
         case PVRTC_RGB_2BPP:
             image.format = GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+            pvrtc_bitperpixel = 2;
+            break;
         case PVRTC_RGBA_2BPP:
             image.format = GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
             pvrtc_bitperpixel = 2;
             break;
         case PVRTC_RGB_4BPP:
             image.format = GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+            pvrtc_bitperpixel = 4;
+            break;
         case PVRTC_RGBA_4BPP:
             image.format = GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
             pvrtc_bitperpixel = 4;
