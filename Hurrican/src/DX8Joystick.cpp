@@ -198,8 +198,17 @@ bool DirectJoystickClass::Init(HWND hwnd, LPDIRECTINPUT8 lpDI)
     return true;
 }
 #elif defined(PLATFORM_SDL)
+
+#if SDL_VERSION_ATLEAST(2,0,0)
+    #define SDLJOYINDEX lpDIJoystick
+#else
+    #define SDLJOYINDEX joy
+#endif
+
 bool DirectJoystickClass::Init(int joy)
 {
+
+
     lpDIJoystick = SDL_JoystickOpen(joy);
 
     if (lpDIJoystick == NULL)
@@ -215,11 +224,11 @@ bool DirectJoystickClass::Init(int joy)
     CanForceFeedback = false;       // Forced false for now until implemented
 
     // Get joystick's name
-    if (strlen(SDL_JoystickName(joy)) < sizeof(JoystickName)) {
-        strcpy_s(JoystickName, SDL_JoystickName(joy));
+    if (strlen(SDL_JoystickName(SDLJOYINDEX)) < sizeof(JoystickName)) {
+        strcpy_s(JoystickName, SDL_JoystickName(SDLJOYINDEX));
     } else {
-        strcpy_s(JoystickName, sizeof(JoystickName)-1, SDL_JoystickName(joy));      // Truncate to fit 
-        JoystickName[sizeof(JoystickName)-1] = '\0';                                // and null-terminate 
+        strcpy_s(JoystickName, sizeof(JoystickName)-1, SDL_JoystickName(SDLJOYINDEX)); // Truncate to fit 
+        JoystickName[sizeof(JoystickName)-1] = '\0';                                   // and null-terminate 
     }
 
     Protokoll.WriteText( false, "Joystick %d: Acquire successful!\nButtons: %d Name: %s\n", joy, NumButtons, JoystickName );
