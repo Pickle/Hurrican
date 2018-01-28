@@ -12,8 +12,6 @@
 # rdu2        : IMS display version 2
 # pandora     : Pandora handheld (OpenGLES2)
 
-RDU2SDK=/media/devel/toolchains/rdu/SABRE_SDP/toolchain/usr
-
 ifndef TARGET
 TARGET := linux_GL1
 endif
