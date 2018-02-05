@@ -19,12 +19,12 @@
 
 #if defined(PLATFORM_SDL)
 #include "SDL_port.h"
-#if defined(USE_GL2)
+#if defined(USE_GL2) || defined(USE_GL3)
 #include "cshader.h"
 #if defined(USE_FBO)
 #include "cfbo.h"
 #endif /* USE_FBO */
-#endif /* USE_GL2 */
+#endif /* USE_GL2 || USE_GL3 */
 #else
 #include <d3d8.h>
 #include <d3dx8.h>
@@ -44,7 +44,7 @@
 #define COLORKEY_MODE 1
 #define WHITE_MODE	  2
 
-#if defined(USE_GL2)
+#if defined(USE_GL2) || defined(USE_GL3)
 enum
 {
     PROGRAM_COLOR=0,
@@ -94,7 +94,7 @@ private:
     char*                   glextentsions;
     bool                    use_texture;
     int                     MaxTextureUnits;
-#if defined(USE_GL2)
+#if defined(USE_GL2) || defined(USE_GL3)
     GLuint                  ProgramCurrent;
     CShader                 Shaders[PROGRAM_TOTAL];
 #endif
@@ -116,7 +116,7 @@ public:
     SDL_Rect                WindowView;
     SDL_Rect                RenderView;
     SDL_Rect                RenderRect;
-#if defined(USE_GL2) && defined(USE_FBO)
+#if (defined(USE_GL2) || defined(USE_GL3)) && defined(USE_FBO)
     CFbo                    RenderBuffer;
 #endif
 #endif

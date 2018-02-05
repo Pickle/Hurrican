@@ -114,16 +114,25 @@ GLuint CShader::CompileShader( GLenum type, const string& path )
 
     source = LoadFileToMemory( path, size );
 
-#if defined(USE_GLES2)
-    uint8_t     length;
+#if defined(USE_GLES2) || defined(USE_GLES3)
+    uint8_t     lengthA;
+    uint8_t     lengthB;
     uint8_t*    temp;
+#if defined(USE_GLES3)
+    const char* version   = "#version 320 es\n";
+    const char* precision = "precision highp float;\n";
+#else /* USE_GLES2 */
+    const char* version   = "#version 100\n";
     const char* precision = "precision mediump float;\n";
+#endif
 
-    length = strlen(precision);
-    temp = new uint8_t[size+length];
+    lengthA = strlen(version);
+    lengthB = strlen(precision);
+    temp = new uint8_t[size+lengthA+lengthB];
 
-    memcpy( temp, precision, length );
-    memcpy( temp+length, source, size );
+    memcpy( temp, version, lengthA );
+    memcpy( temp+lengthA, precision, lengthB );
+    memcpy( temp+lengthA+lengthB, source, size );
 
     delete [] source;
     source = temp;
