@@ -169,6 +169,8 @@ int8_t EGL_Open( uint16_t width, uint16_t height, uint16_t depth, bool vsync )
     {
 #if defined(USE_GLES2)
           EGL_CONTEXT_CLIENT_VERSION,     2,
+#elif defined(USE_GLES3)
+          EGL_CONTEXT_CLIENT_VERSION,     3,
 #endif
           EGL_NONE
     };
@@ -414,9 +416,11 @@ int8_t FindEGLConfigs( void )
 #if defined(EGL_VERSION_1_2)
     ConfigAttribs[attrib++] = EGL_RENDERABLE_TYPE;                  /* 17 */
 #if defined(USE_GLES1)
-    ConfigAttribs[attrib++] = EGL_OPENGL_ES_BIT;
+    ConfigAttribs[attrib++] = EGL_OPENGL_ES_BIT;                    /* 18 */
 #elif defined(USE_GLES2)
     ConfigAttribs[attrib++] = EGL_OPENGL_ES2_BIT;                   /* 18 */
+#elif defined(USE_GLES3)
+    ConfigAttribs[attrib++] = EGL_OPENGL_ES3_BIT;                   /* 18 */
 #endif /* USE_GLES1 */
 #endif /* EGL_VERSION_1_2 */
     ConfigAttribs[attrib++] = EGL_SAMPLE_BUFFERS;                   /* 19 */
