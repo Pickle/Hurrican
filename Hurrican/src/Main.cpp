@@ -134,11 +134,11 @@ CCracktro				*Cracktro;
 RECT					srcrect, destrect;
 
 int						LanguageFileCount;				// Anzahl gefundener Language Files
-char					LanguageFiles[MAX_LANGUAGE_FILES][MAX_LANGUAGE_FILENAME_LENGTH]; 
+char					LanguageFiles[MAX_LANGUAGE_FILES][MAX_LANGUAGE_FILENAME_LENGTH];
 char					ActualLanguage[256];			// Gewählte Language
-char                    *g_storage_ext = NULL;          // Where data files (levels, graphics, music, etc) 
+char                    *g_storage_ext = NULL;          // Where data files (levels, graphics, music, etc)
                                                         //      for the game are stored (read)
-char                    *g_save_ext = NULL;             // Where configuration files, logs, and save games 
+char                    *g_save_ext = NULL;             // Where configuration files, logs, and save games
                                                         //      are written (-DKS) (write)
 
 sCommandLineParams		CommandLineParams;
@@ -295,13 +295,13 @@ bool FindDir(const char *dir)
     struct _stat st;
     if (!dir || _stat(dir, &st) != 0)
         return false;
-    else 
+    else
         return _S_ISDIR(st.st_mode) != 0;
 #else
     struct stat st;
     if (!dir || stat(dir, &st) != 0)
         return false;
-    else 
+    else
         return S_ISDIR(st.st_mode) != 0;
 #endif
 }
@@ -396,6 +396,9 @@ void FillCommandLineParams( int argc, char* args[] )
 
     // Set some sensible defaults
     CommandLineParams.RunWindowMode = false;
+#if (defined(PLATFORM_SDL) && SDL_VERSION_ATLEAST(2,0,0))
+    CommandLineParams.RunBorderless = false;
+#endif
     CommandLineParams.TexFactor = 1;
     CommandLineParams.TexSizeMin = 1024;
     CommandLineParams.ScreenDepth = DEFAULT_SCREENBPP;
@@ -408,7 +411,7 @@ void FillCommandLineParams( int argc, char* args[] )
 
     for (i=1; i<argc; i++)
     {
-        if ((strstr( args[i], "--help" ) != NULL) || (strstr( args[i], "-?") != NULL ) || 
+        if ((strstr( args[i], "--help" ) != NULL) || (strstr( args[i], "-?") != NULL ) ||
                 (strstr( args[i], "-H") !=NULL) || (strstr( args[i], "-h") != NULL))
         {
             Protokoll.WriteText( false, "Hurrican\n"  );
@@ -416,6 +419,9 @@ void FillCommandLineParams( int argc, char* args[] )
             Protokoll.WriteText( false, "  Arguments\n" );
             Protokoll.WriteText( false, "  -H,-?, --help           : Show this information\n" );
             Protokoll.WriteText( false, "  -W,    --windowmode     : Run in a window, not fullsreen\n" );
+#if (defined(PLATFORM_SDL) && SDL_VERSION_ATLEAST(2,0,0))
+            Protokoll.WriteText( false, "  -B,    --borderless     : Run the window with no border\n" );
+#endif
             Protokoll.WriteText( false, "  -F,    --showfps        : Show the current frames per second\n" );
             Protokoll.WriteText( false, "  -D x,  --depth x        : Set screen pixel depth to x (16, 24, 32)\n" );
             Protokoll.WriteText( false, "                            ( Default is %d )\n", DEFAULT_SCREENBPP );
@@ -446,6 +452,13 @@ void FillCommandLineParams( int argc, char* args[] )
             CommandLineParams.RunWindowMode = true;
             fprintf( stdout, "Window mode is enabled\n" );
         }
+#if (defined(PLATFORM_SDL) && SDL_VERSION_ATLEAST(2,0,0))
+        else if ((strstr( args[i], "--windowmode_borderless" ) != NULL) || (strstr( args[i], "-B") != NULL))
+        {
+            CommandLineParams.RunBorderless = true;
+            fprintf( stdout, "Borderless Window mode is enabled\n" );
+        }
+#endif
         else if ((strstr( args[i], "--showfps" ) != NULL) || (strstr( args[i], "-F") != NULL))
         {
             CommandLineParams.ShowFPS = true;
@@ -667,7 +680,7 @@ int main(int argc, char *argv[])
             success = CreateDir(g_save_ext);
             if (!success) {
                 // We weren't able to create the $HOME/.turrican directory, or if it exists, it is
-                // not a directory or is not accessible somehow.. 
+                // not a directory or is not accessible somehow..
                 Protokoll.WriteText( false, "ERROR: unable to create or access $HOME/.hurrican/ directory.\n" );
                 Protokoll.WriteText( false, "\tFull path that was tried: %s\n", g_save_ext );
                 free(g_save_ext);
@@ -1622,7 +1635,7 @@ void ShowFPS()
     unsigned int cur_ticks = timeGetTime();
     unsigned int ticks_elapsed = cur_ticks - ticks_fps_last_updated;
     if (ticks_elapsed > fps_update_freq_in_ticks && frame_ctr > 0) {
-        float avg_fps = (float)frame_ctr * 
+        float avg_fps = (float)frame_ctr *
             (1000.0f / (float)fps_update_freq_in_ticks) *
             ((float)fps_update_freq_in_ticks / (float)ticks_elapsed);
         sprintf_s(char_buf, "FPS: %.1f", avg_fps );

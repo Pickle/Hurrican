@@ -224,18 +224,6 @@
 			<Add library="SDL_mixer" />
 			<Add library="SDL" />
 		</Linker>
-		<Unit filename="data/shaders/shader_color.frag">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="data/shaders/shader_color.vert">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="data/shaders/shader_texture.frag">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="data/shaders/shader_texture.vert">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="src/Boss_BigFish.cpp" />
 		<Unit filename="src/Boss_BigFish.h" />
 		<Unit filename="src/Boss_Bratklops.cpp" />

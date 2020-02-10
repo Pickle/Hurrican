@@ -162,16 +162,16 @@ endif
 ifeq ($(TARGET),rdu2)
 
 EXE := ../hurrican
-CXX := $(RDU2SDK)/bin/armv7l-ims-linux-gnueabihf-g++
-CC  := $(RDU2SDK)/bin/armv7l-ims-linux-gnueabihf-gcc
-LD  := $(RDU2SDK)/bin/armv7l-ims-linux-gnueabihf-g++
+CXX := $(RDU2SDK)/bin/armv7l-zii-linux-gnueabihf-g++
+CC  := $(RDU2SDK)/bin/armv7l-zii-linux-gnueabihf-gcc
+LD  := $(RDU2SDK)/bin/armv7l-zii-linux-gnueabihf-g++
 RM  := rm -f
 
 USE_EGL := yes
 USE_GL2 := yes
 USE_FBO := yes
 
-DEFINES += -DRDU -DUSE_GL2 -DUSE_GLES2 -DUSE_ETC1 -DUSE_FBO -DUSE_EGL_RAW -DMESA_EGL_NO_X11_HEADERS
+DEFINES += -DRDU -DUSE_GL2 -DUSE_GLES2 -DUSE_FBO -DMESA_EGL_NO_X11_HEADERS
 DEFINES += -DUSE_HOME_DIR
 DEFINES += -DUSE_TRIG_LOOKUP_TABLE
 DEFINES += -DUSE_FAST_RNG

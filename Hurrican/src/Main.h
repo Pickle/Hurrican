@@ -35,6 +35,9 @@ struct sCommandLineParams
     uint16_t TexFactor;
     uint16_t TexSizeMin;
     bool    AllowNPotTextureSizes;
+#if SDL_VERSION_ATLEAST(2,0,0)
+    bool RunBorderless;
+#endif
 #endif
     bool    ShowFPS;
     bool    VSync;

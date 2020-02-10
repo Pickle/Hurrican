@@ -251,6 +251,8 @@ bool DirectGraphicsClass::Init(HWND hwnd, DWORD dwBreite, DWORD dwHoehe,
 
     uint16_t ScreenDepth    = CommandLineParams.ScreenDepth;
 #if SDL_VERSION_ATLEAST(2,0,0)
+    SDL_Rect bounds;
+    bool isBorderless       = CommandLineParams.RunBorderless;
     uint32_t flags          = SDL_WINDOW_OPENGL;
 #else /* SDL 1.2 */
 #if defined(USE_EGL_SDL) || defined(USE_EGL_RAW) || defined(USE_EGL_RPI)
@@ -334,10 +336,26 @@ bool DirectGraphicsClass::Init(HWND hwnd, DWORD dwBreite, DWORD dwHoehe,
         flags |= SDL_FULLSCREEN;
 #endif
     }
+#if SDL_VERSION_ATLEAST(2,0,0)
+    else
+    {
+        SDL_GetDisplayUsableBounds( 0, &bounds );
+        Protokoll.WriteText( false, "-> Usable area: x=%d y=%d w=%d h=%d\n", bounds.x, bounds.y, bounds.w, bounds.h );
+
+        ScreenWidth  = bounds.w;
+        ScreenHeight = bounds.h;
+
+        if (isBorderless == true)
+        {
+            flags |= SDL_WINDOW_BORDERLESS;
+        }
+    }
+#endif
+
 
 #if SDL_VERSION_ATLEAST(2,0,0)
     // Create a window. Window mode MUST include SDL_WINDOW_OPENGL for use with OpenGL.
-    Window = SDL_CreateWindow("Hurrican", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+    Window = SDL_CreateWindow("Hurrican", bounds.x, bounds.y,
                               ScreenWidth, ScreenHeight, flags);
 
     // Create an OpenGL context associated with the window.
@@ -397,7 +415,7 @@ bool DirectGraphicsClass::Init(HWND hwnd, DWORD dwBreite, DWORD dwHoehe,
                 } else {
                     Protokoll.WriteText( false, "-> VSync enabled successfully\n" );
                     VSyncEnabled = true;
-                } 
+                }
             } else {
                 Protokoll.WriteText( false, "-> VSync with late-swap-tearing enabled successfully\n" );
                 VSyncEnabled = true;
