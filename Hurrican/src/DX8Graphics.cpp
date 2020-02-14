@@ -6,7 +6,7 @@
 // zum initialisieren von DirectX8
 // beinhaltet zudem verschiedene Grafik-Funktionen zum Speichern von Screenshots usw
 //
-// (c) 2002 Jörg M. Winterstein
+// (c) 2002 JÃ¶rg M. Winterstein
 //
 // --------------------------------------------------------------------------------------
 
@@ -111,7 +111,7 @@ bool DirectGraphicsClass::Init(HWND hwnd, DWORD dwBreite, DWORD dwHoehe,
     d3dpp.AutoDepthStencilFormat			= D3DFMT_D16;
     d3dpp.hDeviceWindow						= hwnd;							// Fenster Handle
     d3dpp.BackBufferWidth					= dwBreite;					    // ScreenBreite
-    d3dpp.BackBufferHeight					= dwHoehe;					    // Screenhöhe
+    d3dpp.BackBufferHeight					= dwHoehe;					    // ScreenhÃ¶he
     d3dpp.BackBufferFormat					= D3DFMT_X8R8G8B8;
 
     d3dpp.SwapEffect	= D3DSWAPEFFECT_COPY_VSYNC;		// VSync an
@@ -212,7 +212,7 @@ _ModeFound:
         SquareOnly = false;
     }
 
-    // Device kann nur Texturen mit 2er-Potenz-Grösse
+    // Device kann nur Texturen mit 2er-Potenz-GrÃ¶sse
     if (d3dCaps.TextureCaps & D3DPTEXTURECAPS_POW2)
     {
         Protokoll.WriteText( false, "Power of Two: TRUE\n" );
@@ -228,7 +228,7 @@ _ModeFound:
 
     Protokoll.WriteText( false, "\n-> Direct3D init successful!\n\n" );
 
-    // DegreetoRad-Tabelle füllen
+    // DegreetoRad-Tabelle fÃ¼llen
     for(int i=0; i<360; i++)
         DegreetoRad[i] = float(PI * i / 180);
 
@@ -305,24 +305,28 @@ bool DirectGraphicsClass::Init(HWND hwnd, DWORD dwBreite, DWORD dwHoehe,
 
     //DKS - Some SDL versions < 1.3.0 support setting vsync through a now-deprecated attribute:
 #if !SDL_VERSION_ATLEAST(1,3,0) && defined(SDL_GL_SWAP_CONTROL)
-    SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, VSync);
+    SDL_GL_SetAttribute( SDL_GL_SWAP_CONTROL, VSync );
 #endif
 
 #if SDL_VERSION_ATLEAST(2,0,0)
 #if defined(USE_GLES1)
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES );
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 1 );
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
+    Protokoll.WriteText( false, "Requested SDL for context OpenGL-ES 1.1.\n" );
 #elif defined(USE_GLES2)
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES );
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
+    Protokoll.WriteText( false, "Requested SDL for context OpenGL-ES 2.0.\n" );
 #elif defined(USE_GLES3)
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES );
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 2 );
+    Protokoll.WriteText( false, "Requested SDL for context OpenGL-ES 3.2.\n" );
 #else
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+    Protokoll.WriteText( false, "Requested SDL for context OpenGL Core.\n" );
 #endif /* defined(USE_GLES1) */
 #endif /* SDL_VERSION_ATLEAST(2,0,0) */
 #endif /* PLATFORM_SDL */
@@ -342,13 +346,16 @@ bool DirectGraphicsClass::Init(HWND hwnd, DWORD dwBreite, DWORD dwHoehe,
         SDL_GetDisplayUsableBounds( 0, &bounds );
         Protokoll.WriteText( false, "-> Usable area: x=%d y=%d w=%d h=%d\n", bounds.x, bounds.y, bounds.w, bounds.h );
 
-        ScreenWidth  = bounds.w;
-        ScreenHeight = bounds.h;
+        ScreenWidth  = MAX( SCREENWIDTH, bounds.w );
+        ScreenHeight = MAX( SCREENHEIGHT, bounds.h );
 
         if (isBorderless == true)
         {
             flags |= SDL_WINDOW_BORDERLESS;
         }
+
+        ScreenWidth = 640;
+        ScreenHeight = 480;
     }
 #endif
 
@@ -481,7 +488,7 @@ bool DirectGraphicsClass::Init(HWND hwnd, DWORD dwBreite, DWORD dwHoehe,
 
     Protokoll.WriteText( false, "\n-> OpenGL init successful!\n\n" );
 
-    // DegreetoRad-Tabelle füllen
+    // DegreetoRad-Tabelle fÃ¼llen
     for(int i=0; i<360; i++)
         DegreetoRad[i] = float(PI * i / 180);
 
@@ -523,8 +530,8 @@ bool DirectGraphicsClass::Exit(void)
 }
 
 // --------------------------------------------------------------------------------------
-// Infos für Device Objekt setzen
-// Für Init und nach Task Wechsel
+// Infos fÃ¼r Device Objekt setzen
+// FÃ¼r Init und nach Task Wechsel
 // --------------------------------------------------------------------------------------
 
 bool DirectGraphicsClass::SetDeviceInfo(void)
@@ -532,7 +539,7 @@ bool DirectGraphicsClass::SetDeviceInfo(void)
 #if defined(PLATFORM_DIRECTX)
     HRESULT hr;
 
-    // Globale Variable mit dem tatsächlichen BackBuffer füllen
+    // Globale Variable mit dem tatsÃ¤chlichen BackBuffer fÃ¼llen
     lpD3DDevice->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &lpBackbuffer);
 
     // Licht, Cullmodus und Z-Buffer aktivieren
@@ -598,7 +605,7 @@ bool DirectGraphicsClass::SetDeviceInfo(void)
     Protokoll.WriteText( false, "GL_SHADING_LANGUAGE_VERSION: %s\n", output );
 #endif
     glextentsions = (char*)glGetString( GL_EXTENSIONS );
-    Protokoll.WriteText( false, "GL_EXTENSIONS: %s\n", glextentsions );
+    Protokoll.WriteText( false, "GL_EXTENSIONS: %s\n\n", glextentsions );
 
 #if defined(USE_ETC1)
     SupportedETC1 = ExtensionSupported( "GL_OES_compressed_ETC1_RGB8_texture" );
@@ -632,15 +639,15 @@ bool DirectGraphicsClass::SetDeviceInfo(void)
 
     sprintf_s(vert, "%s/data/shaders/%s/shader_texture.vert", g_storage_ext, glsl_version);
 #if defined(USE_ETC1)
-    if (SupportedETC1 == true) {
+    if (SupportedETC1 == true)
+    {
         sprintf_s(frag, "%s/data/shaders/%s/shader_etc1_texture.frag", g_storage_ext, glsl_version);
-    } else {
-#endif
-        sprintf_s(frag, "%s/data/shaders/%s/shader_texture.frag", g_storage_ext, glsl_version);
-#if defined(USE_ETC1)
     }
+    else
 #endif
-
+    {
+        sprintf_s(frag, "%s/data/shaders/%s/shader_texture.frag", g_storage_ext, glsl_version);
+    }
 
     if (Shaders[PROGRAM_TEXTURE].Load( vert, frag ) != 0)
     {
@@ -698,7 +705,7 @@ bool DirectGraphicsClass::TakeScreenshot(const char Filename[100], int screenx, 
 {
 #if defined(PLATFORM_DIRECTX)
     FILE*				f = NULL;					// Datei
-    HRESULT				hr;							// Für Fehler-Prüfung
+    HRESULT				hr;							// FÃ¼r Fehler-PrÃ¼fung
     IDirect3DSurface8*	FrontBuffer;				// Zeiger auf Frontbuffer
 
     // Surface erzeugen, in die das Bild kopiert wird
@@ -715,7 +722,7 @@ bool DirectGraphicsClass::TakeScreenshot(const char Filename[100], int screenx, 
         return false;
     }
 
-    // BMP Datei erzeugen, wobei bereits existierende Dateien nicht überschrieben werden
+    // BMP Datei erzeugen, wobei bereits existierende Dateien nicht Ã¼berschrieben werden
     // so entstehen dann Screenshot000 - Screenshot999
 
     char	TempName[100];
@@ -763,7 +770,7 @@ bool DirectGraphicsClass::TakeScreenshot(const char Filename[100], int screenx, 
 }
 
 // --------------------------------------------------------------------------------------
-// Renderstates für Sprites mit ColorKey setzen
+// Renderstates fÃ¼r Sprites mit ColorKey setzen
 // --------------------------------------------------------------------------------------
 
 void DirectGraphicsClass::SetColorKeyMode(void)
@@ -782,7 +789,7 @@ void DirectGraphicsClass::SetColorKeyMode(void)
 }
 
 // --------------------------------------------------------------------------------------
-// Renderstates für Sprites setzen, die komplett weiss gerendert werden
+// Renderstates fÃ¼r Sprites setzen, die komplett weiss gerendert werden
 // --------------------------------------------------------------------------------------
 
 void DirectGraphicsClass::SetWhiteMode(void)
@@ -801,7 +808,7 @@ void DirectGraphicsClass::SetWhiteMode(void)
 }
 
 // --------------------------------------------------------------------------------------
-// Renderstates für Sprites mit Additivem Alphablending setzen
+// Renderstates fÃ¼r Sprites mit Additivem Alphablending setzen
 // --------------------------------------------------------------------------------------
 
 void DirectGraphicsClass::SetAdditiveMode(void)
@@ -820,12 +827,12 @@ void DirectGraphicsClass::SetAdditiveMode(void)
 }
 
 // --------------------------------------------------------------------------------------
-// Renderstates für linearen Texturfilter ein/ausschalten
+// Renderstates fÃ¼r linearen Texturfilter ein/ausschalten
 // --------------------------------------------------------------------------------------
 
 void DirectGraphicsClass::SetFilterMode (bool filteron)
 {
-    // Filter schon an? Dann nichts ändern
+    // Filter schon an? Dann nichts Ã¤ndern
     //
 
     if (filteron == FilterMode)
@@ -980,7 +987,7 @@ void DirectGraphicsClass::RendertoBuffer (D3DPRIMITIVETYPE PrimitiveType,
         glDisableClientState( GL_TEXTURE_COORD_ARRAY );
     }
 #elif defined(USE_GL2) || defined(USE_GL3)
-    // Disbale attributes and uniforms
+    // Disable attributes and uniforms
     glDisableVertexAttribArray( Shaders[ProgramCurrent].NamePos );
     glDisableVertexAttribArray( Shaders[ProgramCurrent].NameClr );
 
@@ -1021,47 +1028,6 @@ bool DirectGraphicsClass::ExtensionSupported( const char* ext )
 }
 #endif
 
-//DKS - Supports new TexturesystemClass and is now used for both GL and DirectX
-#if 0
-#if defined(PLATFORM_SDL)
-void DirectGraphicsClass::SetTexture( int32_t index )
-{
-    if (index >= 0)
-    {
-        use_texture = true;
-        glBindTexture( GL_TEXTURE_2D, textures.at(index) );
-#if defined(USE_GL1)
-        glEnable( GL_TEXTURE_2D );
-#endif
-#if defined(USE_ETC1)
-        if (SupportedETC1 == true)
-        {
-            glActiveTexture( GL_TEXTURE1 );
-            glBindTexture( GL_TEXTURE_2D, alphatexs.at(index) );
-            glActiveTexture( GL_TEXTURE0 );
-        }
-#endif
-    }
-    else
-    {
-        use_texture = false;
-        glBindTexture( GL_TEXTURE_2D, 0 );
-#if defined(USE_GL1)
-        glDisable( GL_TEXTURE_2D );
-#endif
-
-#if defined(USE_ETC1)
-        if (SupportedETC1 == true)
-        {
-            glActiveTexture( GL_TEXTURE1 );
-            glBindTexture( GL_TEXTURE_2D, 0 );
-            glActiveTexture( GL_TEXTURE0 );
-        }
-#endif
-    }
-}
-#endif
-#endif //0
 void DirectGraphicsClass::SetTexture( int idx )
 {
     if (idx >= 0)
@@ -1072,6 +1038,7 @@ void DirectGraphicsClass::SetTexture( int idx )
 #if defined(PLATFORM_DIRECTX)
 #else   // BEGIN GL CODE
         glBindTexture( GL_TEXTURE_2D, th.tex);
+
 #if defined(USE_ETC1)
         if (SupportedETC1 == true)
         {
@@ -1081,10 +1048,10 @@ void DirectGraphicsClass::SetTexture( int idx )
             glActiveTexture( GL_TEXTURE0 );
         }
 #endif
-
 #if defined(USE_GL1)
         glEnable( GL_TEXTURE_2D );
 #endif
+
 #endif  // END GL CODE
     }
     else
@@ -1093,23 +1060,11 @@ void DirectGraphicsClass::SetTexture( int idx )
 #if defined(PLATFORM_DIRECTX)
         lpD3DDevice->SetTexture (0, NULL);							// Textur setzen
 #else // BEGIN GL CODE
-        //DKS - There is no need to call glBindTexture():
-        //glBindTexture( GL_TEXTURE_2D, 0 );
+
 #if defined(USE_GL1)
         glDisable( GL_TEXTURE_2D );
 #endif
 
-        //DKS - There is no need to call glBindTexture():
-#if 0
-#if defined(USE_ETC1)
-        if (SupportedETC1 == true)
-        {
-            glActiveTexture( GL_TEXTURE1 );
-            glBindTexture( GL_TEXTURE_2D, 0 );
-            glActiveTexture( GL_TEXTURE0 );
-        }
-#endif
-#endif //0
 #endif // END GL CODE
     }
 }
@@ -1160,7 +1115,7 @@ void DirectGraphicsClass::ShowBackBuffer(void)
         RendertoBuffer( D3DPT_TRIANGLESTRIP, 2, &vertices[0] );
 
         use_texture = false;
-        RenderBuffer.BindTexture( use_texture );
+        RenderBuffer.BindTexture( 0 );
 
 #if defined(ANDROID)
         DrawTouchOverlay();

@@ -1,2 +1,4 @@
 *.o
-hurrican
+hurrican.*
+Game_Log.txt
+Hurrican/data/textures/tc/*

@@ -74,8 +74,8 @@ int16_t TexturesystemClass::LoadTexture( const std::string &filename )
             return -1;
         }
 #endif
-    } 
-    
+    }
+
     if (idx == -1) {
         // There were no previous loadings of the texture, so create a new slot for it
         TextureHandle th;
@@ -84,14 +84,14 @@ int16_t TexturesystemClass::LoadTexture( const std::string &filename )
         // Create entry in _texture_map mapping texture's filename to the new _loaded_textures index
         _texture_map[filename] = idx;
     }
-        
+
     TextureHandle &th = _loaded_textures[idx];
 
     if (th.instances > 0) {
         // This texture is already loaded in VRAM
         ++th.instances;
 #ifdef _DEBUG
-        Protokoll.WriteText( false, "-> Prevented loading of duplicate texture: %s, total references: %d\n", 
+        Protokoll.WriteText( false, "-> Prevented loading of duplicate texture: %s, total references: %d\n",
                 filename.c_str(), th.instances);
 #endif
     } else {
@@ -107,14 +107,18 @@ int16_t TexturesystemClass::LoadTexture( const std::string &filename )
     // If we have loaded npot scale factors from an external file, see if we have some for this texture:
     if (!_scalefactors_map.empty()) {
         std::string filename_sans_ext(filename);
+#if defined(USE_ETC1)
+        ReplaceAll( filename_sans_ext, ".pkm", "" );
+#endif
         ReplaceAll( filename_sans_ext, ".png", "" );
+
         std::map< std::string, std::pair<double,double> >::iterator it = _scalefactors_map.find(filename_sans_ext);
         if ( it != _scalefactors_map.end() ) {
             th.npot_scalex = (*it).second.first;
             th.npot_scaley = (*it).second.second;
-#ifdef _DEBUG
+//#ifdef _DEBUG
             Protokoll.WriteText( false, "Using external npot scalefactors %f, %f for texture %s\n", th.npot_scalex, th.npot_scaley, filename.c_str() );
-#endif
+//#endif
         }
     }
 
@@ -182,13 +186,13 @@ void TexturesystemClass::ReadScaleFactorsFiles()
     // Then, handle any files in the compressed-textures subfolders, their data will also be loaded,
     // and any data they contain will override what's already loaded, on a file-by-file basis.
 #if defined(USE_ETC1)
-    fullpath = path + "etc1/" + scalefactors_filename; 
+    fullpath = path + "tc/etc1/" + scalefactors_filename;
     if (FileExists(fullpath.c_str()))
         ReadScaleFactorsFile(fullpath);
 #endif
 
 #if defined(USE_PVRTC)
-    fullpath = path + "pvr/" + scalefactors_filename; 
+    fullpath = path + "tc/pvr/" + scalefactors_filename;
     if (FileExists(fullpath.c_str()))
         ReadScaleFactorsFile(fullpath);
 #endif
@@ -256,7 +260,7 @@ loaded:
                 ' ' + std::string(TextArray[TEXT_LADEN_ERFOLGREICH]) + '\n' );
         DisplayLoadInfo(tmpstr.c_str());
     }
-        
+
     return success;
 }
 
@@ -265,7 +269,7 @@ loaded:
 //      It should be more flexible than the original game's DirectX texture support, in that
 //      it allows for loading textures from disk that are arbitrarily resized.
 #if defined(PLATFORM_DIRECTX)
-bool TexturesystemClass::DX8_LoadTexture( const std::string &path, const std::string &filename, 
+bool TexturesystemClass::DX8_LoadTexture( const std::string &path, const std::string &filename,
                                           void *buf, unsigned int buf_size, TextureHandle &th )
 {
     HRESULT  hresult;
@@ -349,7 +353,7 @@ bool TexturesystemClass::DX8_LoadTexture( const std::string &path, const std::st
             th.npot_scaley = (double)img_info.Height / (double)tex_info.Height;
         }
     }
-    
+
     th.instances = 1;
     return true;
 }

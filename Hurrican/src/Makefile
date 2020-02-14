@@ -64,11 +64,12 @@ DEFINES += -DUSE_INDEXED_BATCH
 # *** END OPTIONAL DEFINES ***
 
 
-TARGET = rdu2
+TARGET = linux_GL2
+
+EXE := ../hurrican.$(TARGET)
 
 ifeq ($(TARGET),aros)
 
-EXE := ../hurricanaros
 CXX := i386-aros-g++
 CC  := i386-aros-gcc
 LD  := i386-aros-g++
@@ -91,7 +92,6 @@ endif
 
 ifeq ($(TARGET),rpi)
 
-EXE := ../hurrican
 CXX := g++
 CC  := gcc
 LD  := g++
@@ -114,7 +114,6 @@ endif
 ifeq ($(TARGET),gcw)
 
 GCWSDK := /opt/gcw0-toolchain/usr
-EXE := ../hurrican
 CXX := $(GCWSDK)/bin/mipsel-gcw0-linux-uclibc-g++
 CC  := $(GCWSDK)/bin/mipsel-gcw0-linux-uclibc-gcc
 LD  := $(GCWSDK)/bin/mipsel-gcw0-linux-uclibc-g++
@@ -138,7 +137,6 @@ endif
 
 ifeq ($(TARGET),rdu)
 
-EXE := ../hurrican
 CXX := $(RDUSDK)/bin/armv7l-ims-linux-gnueabi-g++
 CC  := $(RDUSDK)/bin/armv7l-ims-linux-gnueabi-gcc
 LD  := $(RDUSDK)/bin/armv7l-ims-linux-gnueabi-g++
@@ -161,7 +159,6 @@ endif
 
 ifeq ($(TARGET),rdu2)
 
-EXE := ../hurrican
 CXX := $(RDU2SDK)/bin/armv7l-zii-linux-gnueabihf-g++
 CC  := $(RDU2SDK)/bin/armv7l-zii-linux-gnueabihf-gcc
 LD  := $(RDU2SDK)/bin/armv7l-zii-linux-gnueabihf-g++
@@ -188,7 +185,6 @@ endif
 
 ifeq ($(TARGET),pandora)
 
-EXE := ../hurrican
 CXX := $(PNDSDK)/bin/arm-none-linux-gnueabi-g++
 CC  := $(PNDSDK)/bin/arm-none-linux-gnueabi-gcc
 LD  := $(PNDSDK)/bin/arm-none-linux-gnueabi-g++
@@ -213,7 +209,6 @@ endif
 
 ifeq ($(TARGET),linux_GL1)
 
-EXE := ../hurricanlinux
 CXX := g++
 CC  := gcc
 LD  := g++
@@ -228,7 +223,6 @@ endif
 
 ifeq ($(TARGET),linux_GL2)
 
-EXE := ../hurricanlinux
 CXX := g++
 CC  := gcc
 LD  := g++
@@ -236,18 +230,17 @@ RM  := rm -f
 
 USE_EGL := yes
 USE_GL2 := yes
-USE_FBO := yes
+USE_FBO := no
 
-DEFINES += -DLINUX -DUSE_HOME_DIR -DUSE_GLES2 -DUSE_EGL_SDL
+DEFINES += -DLINUX -DUSE_HOME_DIR -DUSE_GLES2 -DUSE_ETC1
 
-INCLUDES_OS := -I/usr/include -I/usr/include/SDL -I/usr/include/GLES2 -I/usr/include/libmodplug
-LDFLAGS := -g -lSDL -lGLESv2 -lSDL_mixer -lSDL_image -lmodplug -lX11 -lEGL
+INCLUDES_OS := -I/usr/include -I/usr/include/SDL2 -I/usr/include/GLES2 -I/usr/include/libmodplug
+LDFLAGS := -g -lSDL2 -lGLESv2 -lSDL2_mixer -lSDL2_image -lmodplug -lX11 -lEGL
 
 endif
 
 ifeq ($(TARGET),linux_GL3)
 
-EXE := ../hurricanlinux
 CXX := g++
 CC  := gcc
 LD  := g++
@@ -266,7 +259,7 @@ endif
 
 INCLUDES := -I. -I./SDLPort -I./cml $(INCLUDES_OS)
 
-COMMON_CXXFLAGS := -Wall -fsingle-precision-constant -fno-rtti
+COMMON_CXXFLAGS := -Wall -fsingle-precision-constant -fno-rtti -Wno-unused-local-typedefs
 LDFLAGS += $(COMMON_CXXFLAGS)
 
 ifeq ($(USE_FLTO),yes)
@@ -309,18 +302,6 @@ ifeq ($(USE_FBO),yes)
 DEFINES += -DUSE_FBO
 FBO_FILES := SDLPort/cfbo
 endif
-
-
-###### *** DETECT IF GCC VERSION IS >= 4.8 ***
-##     If GCC >= 4.8 is being used, -Wno-unused-local-typedefs must be passed
-##     to avoid numerous spurious warnings compiling against CML libary:
-##     This will convert a version number like 4.8.1 to 4*100+8 and a version
-##     number like 4.10.2 to 4*100+10, allowing direct comparison through bc.
-GCC_VER_GTE48 := $(shell echo `$(CXX) -dumpversion | cut -f1-2 -d.` \>= 4.8 | sed -e 's/\./*100+/g' | bc )
-ifeq ($(GCC_VER_GTE48),1)
-COMMON_CXXFLAGS += -Wno-unused-local-typedefs
-endif
-
 
 COMMON_CXXFLAGS += $(INCLUDES) $(DEFINES)
 

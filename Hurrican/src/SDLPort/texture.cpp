@@ -74,22 +74,22 @@ bool SDL_LoadTexture( const string &path, const string &filename,
         Protokoll.WriteText( true, "Error in SDL_LoadTexture(): empty filename parameter\n" );
         return false;
     }
-    
+
 #if defined(USE_ETC1)
     if (DirectGraphics.SupportedETC1 == true)
     {
         image_t alpha_image;
 
         // First, load the RGB texture:
-        fullpath = path + "/etc1/" + filename_sans_ext + ".pkm";
+        fullpath = path + "/tc/etc1/" + filename_sans_ext + ".pkm";
         success = loadImageETC1(image, fullpath);
-        
+
         if (success) {
             // Then, load the alpha texture:
-            fullpath = path + "/etc1/" + filename_sans_ext + "_alpha.pkm";
+            fullpath = path + "/tc/etc1/" + filename_sans_ext + "_alpha.pkm";
             success = loadImageETC1(alpha_image, fullpath);
         }
-        
+
        if (success) {
             success = load_texture( image, th.tex ) &&
                       load_texture( alpha_image, th.alphatex);
@@ -100,7 +100,7 @@ bool SDL_LoadTexture( const string &path, const string &filename,
 
        if (success)
            goto loaded;
-       else 
+       else
            th.tex = th.alphatex = 0;
     }
 #endif
@@ -108,7 +108,7 @@ bool SDL_LoadTexture( const string &path, const string &filename,
 #if defined(USE_PVRTC)
     if ( DirectGraphics.SupportedPVRTC )
     {
-        fullpath = path + "/pvr/" + filename + ".pvr";
+        fullpath = path + "/tc/pvr/" + filename + ".pvr";
 
 #if defined(_DEBUG)
         Protokoll.WriteText( false, "Using PVR looking for %s\n", fullpath.c_str() );
@@ -143,7 +143,7 @@ loaded:
     } else {
         Protokoll.WriteText( true, "Error loading texture %s in SDL_LoadTexture()\n", filename.c_str() );
     }
-    
+
     return success;
 }
 
@@ -241,18 +241,20 @@ bool loadImageETC1( image_t& image, const std::string &fullpath )
     if (image.data != NULL)
     {
         if ((image.data[0] == 'P') &&
-                (image.data[1] == 'K') &&
-                (image.data[2] == 'M') &&
-                (image.data[3] == ' ')
+            (image.data[1] == 'K') &&
+            (image.data[2] == 'M') &&
+            (image.data[3] == ' ') &&
+            (image.data[4] == '1') &&
+            (image.data[5] == '0')
            )
         {
-            image.format = GL_ETC1_RGB8_OES;
-            image.h = (image.data[14]<<8)+image.data[15];
-            image.w = (image.data[12]<<8)+image.data[13];
-            image.size      = (((image.data[8]<<8)+image.data[9]) / 4) * (((image.data[10]<<8)+image.data[11]) / 4) * 8;
-            image.offset    = ETC1_HEADER_SIZE;
-            image.type      = 0; /* dont care */
-            image.compressed = true;
+            image.format        = GL_ETC1_RGB8_OES;
+            image.h             = (image.data[14]<<8)+image.data[15];
+            image.w             = (image.data[12]<<8)+image.data[13];
+            image.size          = (((image.data[8]<<8)+image.data[9]) / 4) * (((image.data[10]<<8)+image.data[11]) / 4) * 8;
+            image.offset        = ETC1_HEADER_SIZE;
+            image.type          = 0; /* dont care */
+            image.compressed    = true;
 
             Protokoll.WriteText( false, "Loaded ETC type %c%c%c for %s\n", image.data[0], image.data[1], image.data[2], fullpath.c_str() );
 
@@ -316,13 +318,13 @@ bool loadImagePVRTC( image_t& image, const string &fullpath )
             return false;
         }
 
-        image.h = pvrtc_buffer32[6];
-        image.w = pvrtc_buffer32[7];
-        pvrtc_depth     = pvrtc_buffer32[8];
-        image.size      = (image.w * image.h * pvrtc_depth * pvrtc_bitperpixel) / 8;
-        image.offset    = PVRTC_HEADER_SIZE;
-        image.type      = 0; /* dont care */
-        image.compressed = true;
+        image.h             = pvrtc_buffer32[6];
+        image.w             = pvrtc_buffer32[7];
+        pvrtc_depth         = pvrtc_buffer32[8];
+        image.size          = (image.w * image.h * pvrtc_depth * pvrtc_bitperpixel) / 8;
+        image.offset        = PVRTC_HEADER_SIZE;
+        image.type          = 0; /* dont care */
+        image.compressed    = true;
 
         Protokoll.WriteText( false, "Loaded PVRTC type %d for %s\n", pvrtc_buffer32[2], fullpath.c_str() );
 
@@ -400,7 +402,7 @@ bool loadImageSDL( image_t& image, const std::string &fullpath, void *buf, unsig
                 rawDimensions.x = nextPowerOfTwo(rawSurf->w);
                 image.npot_scalex = (double)rawSurf->w / (double)rawDimensions.x;
             }
-            
+
             if (!isPowerOfTwo(rawSurf->h)) {
                 rawDimensions.y = nextPowerOfTwo(rawSurf->h);
                 image.npot_scaley = (double)rawSurf->h / (double)rawDimensions.y;
@@ -449,7 +451,7 @@ bool loadImageSDL( image_t& image, const std::string &fullpath, void *buf, unsig
 
         // Blacklist of image filenames (sub-strings) that shouldn't ever be resized, because of
         // resulting graphics glitches
-        if (   fullpath.find("font")           != string::npos 
+        if (   fullpath.find("font")           != string::npos
             //|| fullpath.find("lightmap")     != string::npos           // Lightmaps were never actually used in the game
             || fullpath.find("hurrican_rund")  != string::npos             // Menu star/nebula background (ugly)
             || fullpath.find("roboraupe")      != string::npos             // Flat spiky enemy worm-like thing (glitches)

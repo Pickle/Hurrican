@@ -67,6 +67,7 @@
 					<Add option="-DUSE_GL1" />
 					<Add option="-DUSE_MODPLUG" />
 					<Add option="-DRGBA_5551" />
+					<Add option="-D_UNIX" />
 					<Add directory="/usr/include/GL" />
 				</Compiler>
 				<Linker>
@@ -87,6 +88,7 @@
 					<Add option="-DUSE_GL2" />
 					<Add option="-DUSE_MODPLUG" />
 					<Add option="-DRGBA_5551" />
+					<Add option="-D_UNIX" />
 					<Add directory="/usr/include/GL" />
 				</Compiler>
 				<Linker>
@@ -109,6 +111,7 @@
 					<Add option="-DUSE_EGL_SDL" />
 					<Add option="-DUSE_MODPLUG" />
 					<Add option="-DRGBA_5551" />
+					<Add option="-D_UNIX" />
 					<Add directory="/usr/include/GLES" />
 				</Compiler>
 				<Linker>
@@ -130,9 +133,9 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DUSE_GL2" />
 					<Add option="-DUSE_GLES2" />
-					<Add option="-DUSE_EGL_SDL" />
+					<Add option="-DUSE_ETC1" />
 					<Add option="-DUSE_MODPLUG" />
-					<Add option="-DRGBA_5551" />
+					<Add option="-D_UNIX" />
 					<Add directory="/usr/include/GLES2" />
 				</Compiler>
 				<Linker>
@@ -182,37 +185,33 @@
 				<Option type="1" />
 				<Option compiler="pandora" />
 				<Compiler>
-					<Add option="-DUSE_EGL_RAW" />
+					<Add option="-g" />
+					<Add option="-DDEBUG" />
 					<Add option="-DUSE_GL2" />
 					<Add option="-DUSE_GLES2" />
-					<Add option="-DUSE_PVRTC" />
+					<Add option="-DUSE_EGL_SDL" />
 					<Add option="-DUSE_MODPLUG" />
-					<Add option="-DPANDORA" />
-					<Add directory="../../../../toolchains/pandora/arm-2010.09/usr/include/libmodplug" />
-					<Add directory="../../../../toolchains/pandora/arm-2010.09/usr/include/GLES2" />
+					<Add option="-DRGBA_5551" />
+					<Add option="-D_UNIX" />
+					<Add directory="/usr/include/GLES2" />
 				</Compiler>
 				<Linker>
+					<Add option="-lc" />
 					<Add library="GLESv2" />
 					<Add library="EGL" />
-					<Add library="IMGegl" />
-					<Add library="srv_um" />
 					<Add library="X11" />
-					<Add library="Xau" />
-					<Add library="Xdmcp" />
 					<Add library="modplug" />
-					<Add library="png12" />
-					<Add library="tiff" />
-					<Add library="jpeg" />
-					<Add library="mad" />
-					<Add library="z" />
-					<Add library="ts" />
-					<Add library="stdc++" />
+					<Add library="GLESv2" />
+					<Add library="EGL" />
+					<Add library="X11" />
+					<Add library="modplug" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fsigned-char" />
+			<Add option="-Wno-unused-local-typedefs" />
 			<Add option="-DPLATFORM_SDL" />
 			<Add directory="src" />
 			<Add directory="src/SDLPort" />
@@ -297,6 +296,9 @@
 		<Unit filename="src/DX8Sound.h" />
 		<Unit filename="src/DX8Sprite.cpp" />
 		<Unit filename="src/DX8Sprite.h" />
+		<Unit filename="src/DX8Texture.cpp" />
+		<Unit filename="src/DX8Texture.h" />
+		<Unit filename="src/DataStructures.h" />
 		<Unit filename="src/GUISystem.cpp" />
 		<Unit filename="src/GUISystem.h" />
 		<Unit filename="src/Gameplay.cpp" />
@@ -490,6 +492,8 @@
 		<Unit filename="src/Logdatei.h" />
 		<Unit filename="src/Main.cpp" />
 		<Unit filename="src/Main.h" />
+		<Unit filename="src/Mathematics.cpp" />
+		<Unit filename="src/Mathematics.h" />
 		<Unit filename="src/MemLeaks.h" />
 		<Unit filename="src/Menu.cpp" />
 		<Unit filename="src/Menu.h" />
@@ -505,31 +509,15 @@
 		<Unit filename="src/SDLPort/SDL_fmod.h" />
 		<Unit filename="src/SDLPort/SDL_port.cpp" />
 		<Unit filename="src/SDLPort/SDL_port.h" />
-		<Unit filename="src/SDLPort/cshader.cpp">
-			<Option target="WIN32 GL2 Debug" />
-			<Option target="Release" />
-			<Option target="Linux GL2 Debug" />
-			<Option target="Linux GLES2 Debug" />
-			<Option target="Pandora GLES2" />
-		</Unit>
-		<Unit filename="src/SDLPort/cshader.h">
-			<Option target="WIN32 GL2 Debug" />
-			<Option target="Release" />
-			<Option target="Linux GL2 Debug" />
-			<Option target="Linux GLES2 Debug" />
-			<Option target="Pandora GLES2" />
-		</Unit>
-		<Unit filename="src/SDLPort/eglport.h">
-			<Option target="Pandora GLES1" />
-			<Option target="Linux GLES2 Debug" />
-			<Option target="Linux GLES1 Debug" />
-			<Option target="Pandora GLES2" />
-		</Unit>
+		<Unit filename="src/SDLPort/cfbo.cpp" />
+		<Unit filename="src/SDLPort/cfbo.h" />
+		<Unit filename="src/SDLPort/cshader.cpp" />
+		<Unit filename="src/SDLPort/cshader.h" />
+		<Unit filename="src/SDLPort/eglport.cpp" />
+		<Unit filename="src/SDLPort/eglport.h" />
 		<Unit filename="src/SDLPort/keymap.h" />
 		<Unit filename="src/SDLPort/opengl.h" />
-		<Unit filename="src/SDLPort/texture.cpp">
-			<Option compilerVar="CC" />
-		</Unit>
+		<Unit filename="src/SDLPort/texture.cpp" />
 		<Unit filename="src/SDLPort/texture.h" />
 		<Unit filename="src/Texts.cpp" />
 		<Unit filename="src/Texts.h" />
@@ -715,16 +703,44 @@
 		<Unit filename="src/cml/cml/vector/vector_promotions.h" />
 		<Unit filename="src/cml/cml/vector/vector_traits.h" />
 		<Unit filename="src/cml/cml/vector/vector_unroller.h" />
+		<Unit filename="src/cml/examples/cml_config.h" />
+		<Unit filename="src/cml/examples/simple.cpp" />
 		<Unit filename="src/lightmap.cpp" />
 		<Unit filename="src/lightmap.h" />
-		<Unit filename="src/mymath.h" />
 		<Unit filename="src/resource.h" />
 		<Unit filename="src/stdafx.cpp" />
 		<Unit filename="src/stdafx.h" />
-		<Unit filename="src/tracealloc.cpp" />
-		<Unit filename="src/unrarlib040/unrarlib/unrarlib.c">
+		<Unit filename="src/tinydir/samples/file_open_sample.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/tinydir/samples/interactive_sample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/tinydir/samples/iterate_sample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/tinydir/samples/random_access_sample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/tinydir/tinydir.h" />
+		<Unit filename="src/tracealloc.cpp" />
+		<Unit filename="src/unrarlib040/samples/unix/getfile/getfile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/unrarlib040/samples/unix/listarchive/listarchive.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/unrarlib040/samples/win32/MS Visual C 6.0/getfile/getfile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/unrarlib040/samples/win32/MS Visual C 6.0/listarchive/listarchive.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/unrarlib040/samples/win32/MS Visual C 6.0/mem2mem/mem2mem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/unrarlib040/samples/win32/MS Visual C 6.0/mem2mem/resource.h" />
+		<Unit filename="src/unrarlib040/unrarlib/unrarlib.cpp" />
 		<Unit filename="src/unrarlib040/unrarlib/unrarlib.h" />
 		<Extensions>
 			<code_completion />

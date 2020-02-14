@@ -267,10 +267,10 @@ bool DirectGraphicsSprite::LoadImage(const char *Filename, int xs, int ys, int x
 
 #if defined(USE_ETC1)
     if (DirectGraphics.SupportedETC1 == true) {
-        sprintf_s( compresstex, "%s/data/textures/etc1/%s.pkm", g_storage_ext, Filename );
+        sprintf_s( compresstex, "%s/data/textures/tc/etc1/%s.pkm", g_storage_ext, Filename );
         if (FileExists(compresstex))
         {
-            sprintf_s( Temp, "%s/data/textures/etc1/%s", g_storage_ext, Filename );
+            sprintf_s( Temp, "%s/data/textures/tc/etc1/%s", g_storage_ext, Filename );
             goto loadfile;
         }
     }
@@ -278,10 +278,10 @@ bool DirectGraphicsSprite::LoadImage(const char *Filename, int xs, int ys, int x
 
 #if defined(USE_PVRTC)
     if (DirectGraphics.SupportedPVRTC == true) {
-        sprintf_s( compresstex, "%s/data/textures/pvr/%s.pvr", g_storage_ext, Filename );
+        sprintf_s( compresstex, "%s/data/textures/tc/pvr/%s.pvr", g_storage_ext, Filename );
         if (FileExists(compresstex))
         {
-            sprintf_s( Temp, "%s/data/textures/pvr/%s", g_storage_ext, Filename );
+            sprintf_s( Temp, "%s/data/textures/tc/pvr/%s", g_storage_ext, Filename );
             goto loadfile;
         }
     }
@@ -392,7 +392,7 @@ loadfile:
 
     // Ausschnitte vorberechnen
     //DKS - array is now dynamically allocated
-    if (itsPreCalcedRects != NULL) 
+    if (itsPreCalcedRects != NULL)
         free(itsPreCalcedRects);
     itsPreCalcedRects = (RECT*)malloc(xfc * yfc * sizeof(RECT));
 
@@ -433,10 +433,10 @@ bool DirectGraphicsSprite::LoadImage(const std::string &filename, uint16_t xs, u
     }
 
     itsTexIdx = Textures.LoadTexture(filename);
-    
+
     if (itsTexIdx == -1) {
         Protokoll.WriteText( true, "Textures.LoadTexture() returned error loading file %s\n", filename.c_str() );
-        return false;       
+        return false;
     }
 
     //DKS - Added scale factors that are combined with correction factors from any
