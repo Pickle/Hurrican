@@ -60,6 +60,7 @@ DirectGraphicsClass::DirectGraphicsClass(void)
 #elif defined(PLATFORM_SDL)
     SupportedETC1 = false;
     SupportedETC2 = false;
+    SupportedASTC = false;
     SupportedPVRTC = false;
 #endif
     use_texture = false;
@@ -354,9 +355,6 @@ bool DirectGraphicsClass::Init(HWND hwnd, DWORD dwBreite, DWORD dwHoehe,
         {
             flags |= SDL_WINDOW_BORDERLESS;
         }
-
-        ScreenWidth = 640;
-        ScreenHeight = 480;
     }
 #endif
 
@@ -614,13 +612,17 @@ bool DirectGraphicsClass::SetDeviceInfo(void)
 #if defined(USE_ETC2)
     SupportedETC2 = ExtensionSupported( "GL_COMPRESSED_RGBA8_ETC2_EAC" );
 #endif
+#if defined(USE_ASTC)
+    #if (defined(GL_KHR_texture_compression_astc_hdr) || defined(GL_KHR_texture_compression_astc_hdr))
+    SupportedASTC = true;
+    #endif
+#endif
 #if defined(USE_PVRTC)
     SupportedPVRTC = ExtensionSupported( "GL_IMG_texture_compression_pvrtc" );
 #endif
 
     /* Init OpenGL */
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );                 /* Set the background black */
-    glClearDepth( 1.0f );                                   /* Depth buffer setup */
 
     glDisable( GL_DEPTH_TEST );                             /* No Depth Testing */
     glEnable( GL_BLEND );

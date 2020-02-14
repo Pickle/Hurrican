@@ -38,6 +38,10 @@ using namespace std;
 #define ETC2_HEADER_SIZE 74
 #endif
 
+#if defined(USE_ASTC)
+#define ASTC_HEADER_SIZE 16
+#endif
+
 #if defined(USE_PVRTC)
 #define GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG			0x8C00
 #define GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG			0x8C01
@@ -119,6 +123,26 @@ bool SDL_LoadTexture( const string &path, const string &filename,
 #endif
 
         success = loadImageETC2( image, fullpath ) &&
+                  load_texture ( image, th.tex );
+
+        delete [] image.data;
+        if (success)
+            goto loaded;
+        else
+            th.tex = 0;
+    }
+#endif
+
+#if defined(USE_ASTC)
+    if (DirectGraphics.SupportedASTC)
+    {
+        fullpath = path + "/tc/astc/" + filename + ".astc";
+
+#if defined(_DEBUG)
+        Protokoll.WriteText( false, "Using ASTC looking for %s\n", fullpath.c_str() );
+#endif
+
+        success = loadImageASTC( image, fullpath ) &&
                   load_texture ( image, th.tex );
 
         delete [] image.data;
@@ -280,7 +304,7 @@ bool loadImageETC1( image_t& image, const std::string &fullpath )
             image.type          = 0; /* dont care */
             image.compressed    = true;
 
-            Protokoll.WriteText( false, "Loaded ETC type %c%c%c for %s\n", image.data[0], image.data[1], image.data[2], fullpath.c_str() );
+            Protokoll.WriteText( false, "Loaded ETC1 type %c%c%c for %s\n", image.data[0], image.data[1], image.data[2], fullpath.c_str() );
 
 #if defined(_DEBUG)
             Protokoll.WriteText( false, "Header %c%c%c%c\nVersion %X\nType %d\nExt Width %d\nExt Height %d\nWidth %d\nHeight %d\n",
@@ -358,6 +382,74 @@ bool loadImageETC2( image_t& image, const std::string &fullpath )
         else
         {
             Protokoll.WriteText( false, "ERROR ETC2 Unknown file type %c%c%c%c\n",  image.data[0], image.data[1], image.data[2], image.data[3] );
+            delete [] image.data;
+            image.data = NULL;
+        }
+    }
+
+    return false;
+}
+#endif
+
+#if defined(USE_ASTC)
+bool loadImageASTC( image_t& image, const std::string &fullpath )
+{
+    /*
+        ASTC header declaration.
+        typedef struct
+        {
+    0-3      unsigned char magic[4]
+    4        unsigned char blockdim_x;
+    5        unsigned char blockdim_y;
+    6        unsigned char blockdim_z;
+    7-9      unsigned char xsize[3];
+    10-12    unsigned char ysize[3];
+    13-15    unsigned char zsize[3];
+        } astc_header;
+    */
+
+    uint32_t astc_filesize;
+    uint32_t xblocks, yblocks;
+
+    if (fullpath.empty() || !FileExists(fullpath.c_str()))
+        return false;
+
+    image.data = LoadFileToMemory( fullpath, astc_filesize );
+
+    if (image.data != NULL)
+    {
+        if ((image.data[0] == 0x13) &&
+            (image.data[1] == 0xAB) &&
+            (image.data[2] == 0xA1) &&
+            (image.data[3] == 0x5C)
+           )
+        {
+            image.format        = GL_COMPRESSED_RGBA_ASTC_4x4_KHR;
+            image.h             = (image.data[12]<<16)+(image.data[11]<<8)+image.data[10];
+            image.w             = (image.data[9]<<16)+(image.data[8]<<8)+image.data[7];
+
+            /* Compute number of blocks in each direction. */
+            xblocks = (image.w + image.data[4] - 1) / image.data[4];
+            yblocks = (image.h + image.data[5] - 1) / image.data[5];
+            /* Each block is encoded on 16 bytes, so calculate total compressed image data size. */
+            image.size = xblocks * yblocks << 4;
+
+            image.offset        = ASTC_HEADER_SIZE;
+            image.type          = 0; /* dont care */
+            image.compressed    = true;
+
+            Protokoll.WriteText( false, "Loaded ASTC type %X%X%X for %s\n", image.data[0], image.data[1], image.data[2], fullpath.c_str() );
+
+#if defined(_DEBUG)
+            Protokoll.WriteText( false, "ASTC Header %X%X%X%X\nHeight %X\nWidth %d\nSize %d\n",
+                                 image.data[0], image.data[1], image.data[2], image.data[3],
+                                 image.h, image.w, image.size );
+#endif
+            return true;
+        }
+        else
+        {
+            Protokoll.WriteText( false, "ERROR ASTC Unknown file type %X%X%X%X\n",  image.data[0], image.data[1], image.data[2], image.data[3] );
             delete [] image.data;
             image.data = NULL;
         }

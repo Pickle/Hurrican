@@ -113,6 +113,9 @@ int16_t TexturesystemClass::LoadTexture( const std::string &filename )
 #if defined(USE_ETC2)
         ReplaceAll( filename_sans_ext, ".ktx", "" );
 #endif
+#if defined(USE_ASTC)
+        ReplaceAll( filename_sans_ext, ".astc", "" );
+#endif
         ReplaceAll( filename_sans_ext, ".png", "" );
 
         std::map< std::string, std::pair<double,double> >::iterator it = _scalefactors_map.find(filename_sans_ext);
@@ -196,6 +199,12 @@ void TexturesystemClass::ReadScaleFactorsFiles()
 
 #if defined(USE_ETC2)
     fullpath = path + "tc/etc2/" + scalefactors_filename;
+    if (FileExists(fullpath.c_str()))
+        ReadScaleFactorsFile(fullpath);
+#endif
+
+#if defined(USE_ASTC)
+    fullpath = path + "tc/astc/" + scalefactors_filename;
     if (FileExists(fullpath.c_str()))
         ReadScaleFactorsFile(fullpath);
 #endif

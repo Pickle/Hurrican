@@ -250,9 +250,9 @@ USE_EGL := yes
 USE_GL3 := yes
 USE_FBO := yes
 
-DEFINES += -DLINUX -DUSE_HOME_DIR -DUSE_GLES3 -DUSE_ETC2
+DEFINES += -DLINUX -DUSE_HOME_DIR -DUSE_GLES3 -DUSE_ASTC
 
-INCLUDES_OS := -I/usr/include -I/usr/include/SDL2 -I/usr/include/GLES3 -I/usr/include/libmodplug
+INCLUDES_OS := -I/usr/include -I/usr/include/SDL2 -I/usr/include/GLES2 -I/usr/include/libmodplug
 LDFLAGS := -g -lSDL2 -lGLESv2 -lSDL2_mixer -lSDL2_image -lmodplug -lX11 -lEGL
 
 endif

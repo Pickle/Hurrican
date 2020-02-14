@@ -249,6 +249,22 @@ bool DirectGraphicsSprite::LoadImage(const char *Filename, int xs, int ys, int x
         }
 #endif
 
+#if defined(USE_ETC2)
+        if (DirectGraphics.SupportedETC1 == true) {
+            sprintf_s( compresstex, "%s/levels/%s/%s.ktx", g_storage_ext, CommandLineParams.OwnLevelList, Filename );
+            if (FileExists(compresstex))
+                goto loadfile;
+        }
+#endif
+
+#if defined(USE_ASTC)
+        if (DirectGraphics.SupportedETC1 == true) {
+            sprintf_s( compresstex, "%s/levels/%s/%s.astc", g_storage_ext, CommandLineParams.OwnLevelList, Filename );
+            if (FileExists(compresstex))
+                goto loadfile;
+        }
+#endif
+
 #if defined(USE_PVRTC)
         if (DirectGraphics.SupportedPVRTC == true) {
             sprintf_s( compresstex, "%s/levels/%s/%s.pvr", g_storage_ext,  CommandLineParams.OwnLevelList, Filename );
@@ -271,6 +287,28 @@ bool DirectGraphicsSprite::LoadImage(const char *Filename, int xs, int ys, int x
         if (FileExists(compresstex))
         {
             sprintf_s( Temp, "%s/data/textures/tc/etc1/%s", g_storage_ext, Filename );
+            goto loadfile;
+        }
+    }
+#endif
+
+#if defined(USE_ETC2)
+    if (DirectGraphics.SupportedETC2 == true) {
+        sprintf_s( compresstex, "%s/data/textures/tc/etc2/%s.ktx", g_storage_ext, Filename );
+        if (FileExists(compresstex))
+        {
+            sprintf_s( Temp, "%s/data/textures/tc/etc2/%s", g_storage_ext, Filename );
+            goto loadfile;
+        }
+    }
+#endif
+
+#if defined(USE_ASTC)
+    if (DirectGraphics.SupportedASTC == true) {
+        sprintf_s( compresstex, "%s/data/textures/tc/astc/%s.ktx", g_storage_ext, Filename );
+        if (FileExists(compresstex))
+        {
+            sprintf_s( Temp, "%s/data/textures/tc/astc/%s", g_storage_ext, Filename );
             goto loadfile;
         }
     }

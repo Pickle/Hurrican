@@ -107,6 +107,7 @@ public:
 #elif defined(PLATFORM_SDL)
     bool SupportedETC1;
     bool SupportedETC2;
+    bool SupportedASTC;
     bool SupportedPVRTC;
 #if SDL_VERSION_ATLEAST(2,0,0)
     SDL_Window*             Window;
