@@ -1,19 +1,19 @@
 #!/bin/bash
 
 export DATA="data/textures"
-export TEX=${DATA}"/tc"
-export ETC1=${TEX}"/etc1"
+export TEX="tc"
+export TYPE=${TEX}"/etc1"
 
-cd ..
-rm -rf ${ETC1}
+cd ../${DATA}
+rm -rf ${TYPE}
 mkdir ${TEX}
-mkdir ${ETC1}
+mkdir ${TYPE}
 
-for f in ${DATA}/*.png
+for f in *.png
 do
   echo "Processing $f file..."
   
-  ${MALI_TEX}/bin/etcpack $f ${ETC1} -s fast -c etc1 -ext PNG -as
+  ${MALI_TEX}/bin/etcpack ${f} ${TYPE} -s fast -c etc1 -ext PNG -as
 done
 
 # ETCPACK v4.0.1 for ETC and ETC2

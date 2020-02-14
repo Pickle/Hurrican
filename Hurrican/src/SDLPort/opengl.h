@@ -29,6 +29,9 @@
 #if ((defined(USE_GL1) || defined(USE_GLES1)) && defined(USE_ETC1))
     #warning "Warning: ETC1 support was enabled but is not supported with alpha for GLES 1.1, use 2.0 or higher"
 #endif
+#if ((defined(USE_GL1) || defined(USE_GL2)) && defined(USE_ETC1))
+    #warning "Warning: ETC2 support was enabled but is only supported with GLES 3.0"
+#endif
 #if (defined(USE_FBO) && defined(USE_ETC1))
     #error "ERROR USE_FBO is not supported with the shaders required to run USE_ETC1"
 #endif

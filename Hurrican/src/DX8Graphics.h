@@ -106,6 +106,7 @@ public:
     D3DPRESENT_PARAMETERS	d3dpp;							// Present Parameters
 #elif defined(PLATFORM_SDL)
     bool SupportedETC1;
+    bool SupportedETC2;
     bool SupportedPVRTC;
 #if SDL_VERSION_ATLEAST(2,0,0)
     SDL_Window*             Window;

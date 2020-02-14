@@ -34,6 +34,10 @@ using namespace std;
 #define ETC1_HEADER_SIZE 16
 #endif
 
+#if defined(USE_ETC2)
+#define ETC2_HEADER_SIZE 74
+#endif
+
 #if defined(USE_PVRTC)
 #define GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG			0x8C00
 #define GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG			0x8C01
@@ -105,8 +109,28 @@ bool SDL_LoadTexture( const string &path, const string &filename,
     }
 #endif
 
+#if defined(USE_ETC2)
+    if (DirectGraphics.SupportedETC2)
+    {
+        fullpath = path + "/tc/etc2/" + filename + ".ktx";
+
+#if defined(_DEBUG)
+        Protokoll.WriteText( false, "Using ETC2 looking for %s\n", fullpath.c_str() );
+#endif
+
+        success = loadImageETC2( image, fullpath ) &&
+                  load_texture ( image, th.tex );
+
+        delete [] image.data;
+        if (success)
+            goto loaded;
+        else
+            th.tex = 0;
+    }
+#endif
+
 #if defined(USE_PVRTC)
-    if ( DirectGraphics.SupportedPVRTC )
+    if (DirectGraphics.SupportedPVRTC)
     {
         fullpath = path + "/tc/pvr/" + filename + ".pvr";
 
@@ -268,7 +292,72 @@ bool loadImageETC1( image_t& image, const std::string &fullpath )
         }
         else
         {
-            Protokoll.WriteText( false, "ERROR Unknown file type %c%c%c%c\n",  image.data[0], image.data[1], image.data[2], image.data[3] );
+            Protokoll.WriteText( false, "ERROR ETC1 Unknown file type %c%c%c%c\n",  image.data[0], image.data[1], image.data[2], image.data[3] );
+            delete [] image.data;
+            image.data = NULL;
+        }
+    }
+
+    return false;
+}
+#endif
+
+#if defined(USE_ETC2)
+bool loadImageETC2( image_t& image, const std::string &fullpath )
+{
+    /*
+        00-03 4 bytes header "PKM "
+        04-05 2 bytes version "10"
+        06-07 2 bytes data type (always zero)
+        08-09 2 bytes extended width
+        10-11 2 bytes extended height
+        12-13 2 bytes original width
+        14-15 2 bytes original height
+        rest is data
+
+        compressed size = (extended width / 4) * (extended height / 4) * 8
+    */
+
+    uint32_t etc2_filesize;
+
+    if (fullpath.empty() || !FileExists(fullpath.c_str()))
+        return false;
+
+    image.data = LoadFileToMemory( fullpath, etc2_filesize );
+
+    if (image.data != NULL)
+    {
+        if ((image.data[0] == 0xAB) &&
+            (image.data[1] == 'K') &&
+            (image.data[2] == 'T') &&
+            (image.data[3] == 'X') &&
+            (image.data[4] == ' ') &&
+            (image.data[5] == '1') &&
+            (image.data[6] == '1') &&
+            (image.data[7] == 0xBB)
+           )
+        {
+            image.format        = (image.data[28]<<24)+(image.data[29]<<16)+(image.data[30]<<8)+image.data[31];
+            image.h             = (image.data[40]<<24)+(image.data[41]<<16)+(image.data[42]<<8)+image.data[43];
+            image.w             = (image.data[36]<<24)+(image.data[37]<<16)+(image.data[38]<<8)+image.data[39];
+            image.size          = (image.data[70]<<24)+(image.data[71]<<16)+(image.data[72]<<8)+image.data[73];
+            image.offset        = ETC2_HEADER_SIZE;
+            image.type          = 0; /* dont care */
+            image.compressed    = true;
+
+            Protokoll.WriteText( false, "Loaded ETC2 format %X for %s\n", image.format, fullpath.c_str() );
+
+#if defined(_DEBUG)
+            Protokoll.WriteText( false, "Header %c%c%c%c\nVersion %X\nType %d\nExt Width %d\nExt Height %d\nWidth %d\nHeight %d\n",
+                                 image.data[0], image.data[1], image.data[2], image.data[3],
+                                 (image.data[4]<<8)+image.data[5], (image.data[6]<<8)+image.data[7], (image.data[8]<<8)+image.data[9],
+                                 (image.data[10]<<8)+image.data[11], (image.data[12]<<8)+image.data[13], (image.data[14]<<8)+image.data[15] );
+#endif
+            return true;
+        }
+        else
+        {
+            Protokoll.WriteText( false, "ERROR ETC2 Unknown file type %c%c%c%c\n",  image.data[0], image.data[1], image.data[2], image.data[3] );
             delete [] image.data;
             image.data = NULL;
         }

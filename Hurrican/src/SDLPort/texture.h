@@ -35,7 +35,7 @@ typedef struct IMAGE_T
     uint32_t w, h;
     uint32_t size;
     uint32_t offset;
-    double   npot_scalex, npot_scaley;    //DKS - Correction factors to compensate for any 
+    double   npot_scalex, npot_scaley;    //DKS - Correction factors to compensate for any
                                           //      nearest-power-of-two size expansions.
     GLenum type;
     GLenum format;
@@ -68,6 +68,9 @@ bool load_texture( image_t& image, GLuint &new_texture);
 
 #if defined(USE_ETC1)
 bool loadImageETC1( image_t& image, const std::string &fullpath );
+#endif
+#if defined(USE_ETC2)
+bool loadImageETC2( image_t& image, const std::string &fullpath );
 #endif
 #if defined(USE_PVRTC)
 bool loadImagePVRTC( image_t& image, const std::string &fullpath );

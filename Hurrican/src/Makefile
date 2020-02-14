@@ -64,7 +64,7 @@ DEFINES += -DUSE_INDEXED_BATCH
 # *** END OPTIONAL DEFINES ***
 
 
-TARGET = linux_GL2
+TARGET = linux_GL3
 
 EXE := ../hurrican.$(TARGET)
 
@@ -250,10 +250,10 @@ USE_EGL := yes
 USE_GL3 := yes
 USE_FBO := yes
 
-DEFINES += -DLINUX -DUSE_HOME_DIR -DUSE_GLES3 -DUSE_EGL_SDL
+DEFINES += -DLINUX -DUSE_HOME_DIR -DUSE_GLES3 -DUSE_ETC2
 
-INCLUDES_OS := -I/usr/include -I/usr/include/SDL -I/usr/include/GLES2 -I/usr/include/libmodplug
-LDFLAGS := -g -lSDL -lGLESv2 -lSDL_mixer -lSDL_image -lmodplug -lX11 -lEGL
+INCLUDES_OS := -I/usr/include -I/usr/include/SDL2 -I/usr/include/GLES3 -I/usr/include/libmodplug
+LDFLAGS := -g -lSDL2 -lGLESv2 -lSDL2_mixer -lSDL2_image -lmodplug -lX11 -lEGL
 
 endif
 

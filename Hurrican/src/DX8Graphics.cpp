@@ -59,6 +59,7 @@ DirectGraphicsClass::DirectGraphicsClass(void)
     lpD3D = NULL;
 #elif defined(PLATFORM_SDL)
     SupportedETC1 = false;
+    SupportedETC2 = false;
     SupportedPVRTC = false;
 #endif
     use_texture = false;
@@ -609,6 +610,9 @@ bool DirectGraphicsClass::SetDeviceInfo(void)
 
 #if defined(USE_ETC1)
     SupportedETC1 = ExtensionSupported( "GL_OES_compressed_ETC1_RGB8_texture" );
+#endif
+#if defined(USE_ETC2)
+    SupportedETC2 = ExtensionSupported( "GL_COMPRESSED_RGBA8_ETC2_EAC" );
 #endif
 #if defined(USE_PVRTC)
     SupportedPVRTC = ExtensionSupported( "GL_IMG_texture_compression_pvrtc" );
