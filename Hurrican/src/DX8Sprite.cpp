@@ -250,7 +250,7 @@ bool DirectGraphicsSprite::LoadImage(const char *Filename, int xs, int ys, int x
 #endif
 
 #if defined(USE_ETC2)
-        if (DirectGraphics.SupportedETC1 == true) {
+        if (DirectGraphics.SupportedETC2 == true) {
             sprintf_s( compresstex, "%s/levels/%s/%s.ktx", g_storage_ext, CommandLineParams.OwnLevelList, Filename );
             if (FileExists(compresstex))
                 goto loadfile;
@@ -258,7 +258,7 @@ bool DirectGraphicsSprite::LoadImage(const char *Filename, int xs, int ys, int x
 #endif
 
 #if defined(USE_ASTC)
-        if (DirectGraphics.SupportedETC1 == true) {
+        if (DirectGraphics.SupportedASTC == true) {
             sprintf_s( compresstex, "%s/levels/%s/%s.astc", g_storage_ext, CommandLineParams.OwnLevelList, Filename );
             if (FileExists(compresstex))
                 goto loadfile;

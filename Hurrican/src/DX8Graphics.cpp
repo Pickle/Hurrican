@@ -226,7 +226,10 @@ _ModeFound:
         PowerOfTwo = false;
     }
 
-    SetDeviceInfo();
+    if (SetDeviceInfo() != true)
+    {
+        return false;
+    }
 
     Protokoll.WriteText( false, "\n-> Direct3D init successful!\n\n" );
 
@@ -483,7 +486,10 @@ bool DirectGraphicsClass::Init(HWND hwnd, DWORD dwBreite, DWORD dwHoehe,
     VSyncEnabled = VSync;
 #endif // END VSYNC-RELATED CODE
 
-    SetDeviceInfo();
+    if (SetDeviceInfo() != true)
+    {
+        return false;
+    }
 
     Protokoll.WriteText( false, "\n-> OpenGL init successful!\n\n" );
 
@@ -610,12 +616,21 @@ bool DirectGraphicsClass::SetDeviceInfo(void)
     SupportedETC1 = ExtensionSupported( "GL_OES_compressed_ETC1_RGB8_texture" );
 #endif
 #if defined(USE_ETC2)
-    SupportedETC2 = ExtensionSupported( "GL_COMPRESSED_RGBA8_ETC2_EAC" );
+    #if defined(GL_COMPRESSED_RGBA8_ETC2_EAC)
+    SupportedETC2 = true;
+    #else
+    Protokoll.WriteText( false, "GL_COMPRESSED_RGBA8_ETC2_EAC is not supported\n" );
+    #endif
 #endif
 #if defined(USE_ASTC)
     #if (defined(GL_KHR_texture_compression_astc_hdr) || defined(GL_KHR_texture_compression_astc_hdr))
     SupportedASTC = true;
+    #else
+    Protokoll.WriteText( false, "GL_KHR_texture_compression_astc_hdr/ldr is not supported\n" );
     #endif
+#endif
+#if defined(USE_S3TC_DXT3)
+    SupportedS3TC = ExtensionSupported( "GL_EXT_texture_compression_s3tc" );
 #endif
 #if defined(USE_PVRTC)
     SupportedPVRTC = ExtensionSupported( "GL_IMG_texture_compression_pvrtc" );

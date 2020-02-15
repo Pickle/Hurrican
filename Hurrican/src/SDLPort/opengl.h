@@ -80,7 +80,7 @@
 #endif
 
 #if defined(__WIN32__)
-#if defined(USE_GL2)
+#if (defined(USE_GL2) || defined(USE_GL3))
 /* OpenGL Version 2.0 API */
 extern PFNGLDELETESHADERPROC                glDeleteShader;
 extern PFNGLDELETEPROGRAMPROC               glDeleteProgram;
@@ -108,12 +108,21 @@ extern PFNGLUNIFORM3FVPROC                  glUniform3fv;
 extern PFNGLUNIFORM4FVPROC                  glUniform4fv;
 extern PFNGLUNIFORMMATRIX3FVPROC            glUniformMatrix3fv;
 extern PFNGLUNIFORMMATRIX4FVPROC            glUniformMatrix4fv;
+#endif /* defined(USE_GL2) || defined(USE_GL3) */
+#endif /* defined(__WIN32__) */
+
 /* FBO API */
 #if defined(USE_FBO)
+
+#ifndef GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS
+#define GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS            GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT
+#endif
+
+#if defined(__WIN32__)
+#if defined(USE_GLFULL)
 #define GL_FRAMEBUFFER                                  GL_FRAMEBUFFER_EXT
 #define GL_FRAMEBUFFER_COMPLETE                         GL_FRAMEBUFFER_COMPLETE_EXT
 #define GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT            GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT
-#define GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS            GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT
 #define GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT    GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT
 #define GL_FRAMEBUFFER_UNSUPPORTED                      GL_FRAMEBUFFER_UNSUPPORTED_EXT
 #define GL_COLOR_ATTACHMENT0                            GL_COLOR_ATTACHMENT0_EXT
@@ -126,6 +135,9 @@ extern PFNGLUNIFORMMATRIX4FVPROC            glUniformMatrix4fv;
 #define glBindRenderbuffer                  glBindRenderbufferEXT
 #define glRenderbufferStorage               glRenderbufferStorageEXT
 #define glDeleteRenderbuffers               glDeleteRenderbuffersEXT
+#endif /* defined(USE_GLFULL) */
+
+#if (defined(USE_GL2) || defined(USE_GL3))
 extern PFNGLBINDFRAMEBUFFEREXTPROC          glBindFramebuffer;
 extern PFNGLDELETEFRAMEBUFFERSEXTPROC       glDeleteFramebuffers;
 extern PFNGLGENFRAMEBUFFERSEXTPROC          glGenFramebuffers;
@@ -135,14 +147,16 @@ extern PFNGLGENRENDERBUFFERSEXTPROC         glGenRenderbuffers;
 extern PFNGLBINDRENDERBUFFEREXTPROC         glBindRenderbuffer;
 extern PFNGLRENDERBUFFERSTORAGEEXTPROC      glRenderbufferStorage;
 extern PFNGLDELETERENDERBUFFERSEXTPROC      glDeleteRenderbuffers;
+#endif /* defined(__WIN32__) */
+#endif /* defined(USE_GL2) || defined(USE_GL3) */
 #endif /* defined(USE_FBO) */
-#endif
 
+#if defined(__WIN32__)
 #if defined(USE_GL1) || defined(USE_GL2)
 /* GL_ARB_texture_compression */
 extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC     glCompressedTexImage2D;
 extern PFNGLGETCOMPRESSEDTEXIMAGEARBPROC    glGetCompressedTexImageARB;
-#endif
-#endif /* WIN32 */
+#endif /* defined(USE_GL1) || defined(USE_GL2) */
+#endif /* defined(__WIN32__) */
 
 #endif /* _OPENGL_H_ */

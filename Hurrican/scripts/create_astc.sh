@@ -3,16 +3,22 @@
 export DATA="data/textures"
 export TEX="tc"
 export TYPE=${TEX}"/astc"
+export PNG32=${TEX}"/png32"
 
 cd ../${DATA}
 rm -rf ${TYPE}
+rm -rf ${PNG32}
 mkdir ${TEX}
 mkdir ${TYPE}
+mkdir ${PNG32}
 
 for f in *.png
 do
     echo "Processing $f file..."
-    ${COMPRESSONATOR}/CompressonatorCLI -nomipmap -fd ASTC -BlockRate 4x4 ${f} ${TYPE}/${f}.astc
+    
+    convert ${f} -alpha on PNG32:${PNG32}/${f}
+    
+    ${COMPRESSONATOR}/CompressonatorCLI -nomipmap -fd ASTC -BlockRate 4x4 ${PNG32}/${f} ${TYPE}/${f}.astc
 done
 
 # ------------------------------------------------

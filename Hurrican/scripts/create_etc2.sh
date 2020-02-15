@@ -3,16 +3,22 @@
 export DATA="data/textures"
 export TEX="tc"
 export TYPE=${TEX}"/etc2"
+export PNG32=${TEX}"/png32"
 
 cd ../${DATA}
 rm -rf ${TYPE}
+rm -rf ${PNG32}
 mkdir ${TEX}
 mkdir ${TYPE}
+mkdir ${PNG32}
 
 for f in *.png
 do
     echo "Processing $f file..."
-    ${COMPRESSONATOR}/CompressonatorCLI -nomipmap -fd ETC2_RGBA ${f} ${TYPE}/${f}.ktx
+    
+    convert ${f} -alpha on PNG32:${PNG32}/${f}
+    
+    ${COMPRESSONATOR}/CompressonatorCLI -nomipmap -doswizzle -fd ETC2_RGBA ${PNG32}/${f} ${TYPE}/${f}.ktx
 done
 
 # ------------------------------------------------

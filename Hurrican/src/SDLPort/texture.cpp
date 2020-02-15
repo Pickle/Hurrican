@@ -35,7 +35,7 @@ using namespace std;
 #endif
 
 #if defined(USE_ETC2)
-#define ETC2_HEADER_SIZE 74
+#define ETC2_HEADER_SIZE 64
 #endif
 
 #if defined(USE_ASTC)
@@ -304,7 +304,7 @@ bool loadImageETC1( image_t& image, const std::string &fullpath )
             image.type          = 0; /* dont care */
             image.compressed    = true;
 
-            Protokoll.WriteText( false, "Loaded ETC1 type %c%c%c for %s\n", image.data[0], image.data[1], image.data[2], fullpath.c_str() );
+            Protokoll.WriteText( false, "Using ETC1 (%X) ... ", image.format );
 
 #if defined(_DEBUG)
             Protokoll.WriteText( false, "Header %c%c%c%c\nVersion %X\nType %d\nExt Width %d\nExt Height %d\nWidth %d\nHeight %d\n",
@@ -330,19 +330,33 @@ bool loadImageETC1( image_t& image, const std::string &fullpath )
 bool loadImageETC2( image_t& image, const std::string &fullpath )
 {
     /*
-        00-03 4 bytes header "PKM "
-        04-05 2 bytes version "10"
-        06-07 2 bytes data type (always zero)
-        08-09 2 bytes extended width
-        10-11 2 bytes extended height
-        12-13 2 bytes original width
-        14-15 2 bytes original height
-        rest is data
+       00-11     Byte[12] identifier
+       12-15     UInt32 endianness
+       16-19     UInt32 glType
+       20-23     UInt32 glTypeSize
+       24-27     UInt32 glFormat
+       28-31     Uint32 glInternalFormat
+       32-35     Uint32 glBaseInternalFormat
+       36-39     UInt32 pixelWidth
+       40-43     UInt32 pixelHeight
+       44-47     UInt32 pixelDepth
+       48-51     UInt32 numberOfArrayElements
+       52-55     UInt32 numberOfFaces
+       56-59     UInt32 numberOfMipmapLevels
+       60-63     UInt32 bytesOfKeyValueData
 
-        compressed size = (extended width / 4) * (extended height / 4) * 8
+                for each keyValuePair that fits in bytesOfKeyValueData
+                    UInt32   keyAndValueByteSize
+                    Byte     keyAndValue[keyAndValueByteSize]
+                    Byte     valuePadding[3 - ((keyAndValueByteSize + 3) % 4)]
+                end
+
+                UInt32 imageSize;
     */
 
     uint32_t etc2_filesize;
+    uint32_t meta_size;
+    uint32_t meta_offset;
 
     if (fullpath.empty() || !FileExists(fullpath.c_str()))
         return false;
@@ -361,21 +375,22 @@ bool loadImageETC2( image_t& image, const std::string &fullpath )
             (image.data[7] == 0xBB)
            )
         {
-            image.format        = (image.data[28]<<24)+(image.data[29]<<16)+(image.data[30]<<8)+image.data[31];
-            image.h             = (image.data[40]<<24)+(image.data[41]<<16)+(image.data[42]<<8)+image.data[43];
-            image.w             = (image.data[36]<<24)+(image.data[37]<<16)+(image.data[38]<<8)+image.data[39];
-            image.size          = (image.data[70]<<24)+(image.data[71]<<16)+(image.data[72]<<8)+image.data[73];
-            image.offset        = ETC2_HEADER_SIZE;
+            image.format        = (image.data[31]<<24)+(image.data[30]<<16)+(image.data[29]<<8)+image.data[28];
+            image.h             = (image.data[43]<<24)+(image.data[42]<<16)+(image.data[41]<<8)+image.data[40];
+            image.w             = (image.data[39]<<24)+(image.data[38]<<16)+(image.data[37]<<8)+image.data[36];
+            meta_size           = (image.data[63]<<24)+(image.data[62]<<16)+(image.data[61]<<8)+image.data[60];
+            meta_offset         = ETC2_HEADER_SIZE + meta_size;
+            image.size          = (image.data[meta_offset+3]<<24)+(image.data[meta_offset+2]<<16)+(image.data[meta_offset+1]<<8)+image.data[meta_offset];
+            image.offset        = meta_offset + 4;
             image.type          = 0; /* dont care */
             image.compressed    = true;
 
-            Protokoll.WriteText( false, "Loaded ETC2 format %X for %s\n", image.format, fullpath.c_str() );
+            Protokoll.WriteText( false, "Using ETC2 (%X) ... ", image.format );
 
 #if defined(_DEBUG)
-            Protokoll.WriteText( false, "Header %c%c%c%c\nVersion %X\nType %d\nExt Width %d\nExt Height %d\nWidth %d\nHeight %d\n",
+            Protokoll.WriteText( false, "Header %c%c%c%c\nFormat %X\nHeight %d\nWidth %d\nSize %d\nMetaSize %d\nMetaOffset %d\n",
                                  image.data[0], image.data[1], image.data[2], image.data[3],
-                                 (image.data[4]<<8)+image.data[5], (image.data[6]<<8)+image.data[7], (image.data[8]<<8)+image.data[9],
-                                 (image.data[10]<<8)+image.data[11], (image.data[12]<<8)+image.data[13], (image.data[14]<<8)+image.data[15] );
+                                 image.format, image.h, image.w, image.size, meta_size, meta_offset );
 #endif
             return true;
         }
@@ -438,7 +453,7 @@ bool loadImageASTC( image_t& image, const std::string &fullpath )
             image.type          = 0; /* dont care */
             image.compressed    = true;
 
-            Protokoll.WriteText( false, "Loaded ASTC type %X%X%X for %s\n", image.data[0], image.data[1], image.data[2], fullpath.c_str() );
+            Protokoll.WriteText( false, "Using ASTC (%X) ... ", image.format );
 
 #if defined(_DEBUG)
             Protokoll.WriteText( false, "ASTC Header %X%X%X%X\nHeight %X\nWidth %d\nSize %d\n",
@@ -507,7 +522,7 @@ bool loadImagePVRTC( image_t& image, const string &fullpath )
         image.type          = 0; /* dont care */
         image.compressed    = true;
 
-        Protokoll.WriteText( false, "Loaded PVRTC type %d for %s\n", pvrtc_buffer32[2], fullpath.c_str() );
+        Protokoll.WriteText( false, "Using PVRTC (%X) ... ", image.format );
 
 #if defined(_DEBUG)
         Protokoll.WriteText( false, "Version %X\nFlags %d\nPFormatA %d\nPFormatB %d\nColorS %d\nChanType %d\nHeight %d\nWidth %d\nDepth %d\nNumSurf %d\nNumFaces %d\nMipmap %d\nMeta %d\n", pvrtc_buffer32[0], pvrtc_buffer32[1], pvrtc_buffer32[2], pvrtc_buffer32[3],
