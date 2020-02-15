@@ -265,6 +265,14 @@ bool DirectGraphicsSprite::LoadImage(const char *Filename, int xs, int ys, int x
         }
 #endif
 
+#if defined(USE_DXT3)
+        if (DirectGraphics.SupportedDXT3 == true) {
+            sprintf_s( compresstex, "%s/levels/%s/%s.dds", g_storage_ext, CommandLineParams.OwnLevelList, Filename );
+            if (FileExists(compresstex))
+                goto loadfile;
+        }
+#endif
+
 #if defined(USE_PVRTC)
         if (DirectGraphics.SupportedPVRTC == true) {
             sprintf_s( compresstex, "%s/levels/%s/%s.pvr", g_storage_ext,  CommandLineParams.OwnLevelList, Filename );
@@ -309,6 +317,17 @@ bool DirectGraphicsSprite::LoadImage(const char *Filename, int xs, int ys, int x
         if (FileExists(compresstex))
         {
             sprintf_s( Temp, "%s/data/textures/tc/astc/%s", g_storage_ext, Filename );
+            goto loadfile;
+        }
+    }
+#endif
+
+#if defined(USE_DXT3)
+    if (DirectGraphics.SupportedDXT3 == true) {
+        sprintf_s( compresstex, "%s/data/textures/tc/dxt3/%s.dds", g_storage_ext, Filename );
+        if (FileExists(compresstex))
+        {
+            sprintf_s( Temp, "%s/data/textures/tc/dxt3/%s", g_storage_ext, Filename );
             goto loadfile;
         }
     }
@@ -453,6 +472,7 @@ loadfile:
     return true;
 }
 #endif //0 // END REFERENCE COPY OF ORIGINAL LoadImage()
+
 bool DirectGraphicsSprite::LoadImage(const std::string &filename, uint16_t xs, uint16_t ys, uint16_t xfs, uint16_t yfs,
                                      uint16_t xfc,  uint16_t yfc)
 {

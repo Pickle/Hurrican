@@ -75,6 +75,9 @@ bool loadImageETC2( image_t& image, const std::string &fullpath );
 #if defined(USE_ASTC)
 bool loadImageASTC( image_t& image, const std::string &fullpath );
 #endif
+#if defined(USE_DXT3)
+bool loadImageDXT3( image_t& image, const std::string &fullpath );
+#endif
 #if defined(USE_PVRTC)
 bool loadImagePVRTC( image_t& image, const std::string &fullpath );
 #endif

@@ -108,6 +108,8 @@ public:
     bool SupportedETC1;
     bool SupportedETC2;
     bool SupportedASTC;
+    bool SupportedDXT3;
+    bool SupportedDXT5;
     bool SupportedPVRTC;
 #if SDL_VERSION_ATLEAST(2,0,0)
     SDL_Window*             Window;

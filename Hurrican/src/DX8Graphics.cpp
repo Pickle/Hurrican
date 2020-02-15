@@ -61,6 +61,8 @@ DirectGraphicsClass::DirectGraphicsClass(void)
     SupportedETC1 = false;
     SupportedETC2 = false;
     SupportedASTC = false;
+    SupportedDXT3 = false;
+    SupportedDXT5 = false;
     SupportedPVRTC = false;
 #endif
     use_texture = false;
@@ -629,8 +631,8 @@ bool DirectGraphicsClass::SetDeviceInfo(void)
     Protokoll.WriteText( false, "GL_KHR_texture_compression_astc_hdr/ldr is not supported\n" );
     #endif
 #endif
-#if defined(USE_S3TC_DXT3)
-    SupportedS3TC = ExtensionSupported( "GL_EXT_texture_compression_s3tc" );
+#if defined(USE_DXT3)
+    SupportedDXT3 = ExtensionSupported( "GL_EXT_texture_compression_s3tc" );
 #endif
 #if defined(USE_PVRTC)
     SupportedPVRTC = ExtensionSupported( "GL_IMG_texture_compression_pvrtc" );

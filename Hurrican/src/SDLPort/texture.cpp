@@ -42,6 +42,10 @@ using namespace std;
 #define ASTC_HEADER_SIZE 16
 #endif
 
+#if defined(USE_DXT3)
+#define DXT3_HEADER_SIZE 128
+#endif
+
 #if defined(USE_PVRTC)
 #define GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG			0x8C00
 #define GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG			0x8C01
@@ -114,7 +118,7 @@ bool SDL_LoadTexture( const string &path, const string &filename,
 #endif
 
 #if defined(USE_ETC2)
-    if (DirectGraphics.SupportedETC2)
+    if (DirectGraphics.SupportedETC2 == true)
     {
         fullpath = path + "/tc/etc2/" + filename + ".ktx";
 
@@ -134,7 +138,7 @@ bool SDL_LoadTexture( const string &path, const string &filename,
 #endif
 
 #if defined(USE_ASTC)
-    if (DirectGraphics.SupportedASTC)
+    if (DirectGraphics.SupportedASTC == true)
     {
         fullpath = path + "/tc/astc/" + filename + ".astc";
 
@@ -153,8 +157,28 @@ bool SDL_LoadTexture( const string &path, const string &filename,
     }
 #endif
 
+#if defined(USE_DXT3)
+    if (DirectGraphics.SupportedDXT3 == true)
+    {
+        fullpath = path + "/tc/dxt3/" + filename + ".dds";
+
+#if defined(_DEBUG)
+        Protokoll.WriteText( false, "Using DXT3 looking for %s\n", fullpath.c_str() );
+#endif
+
+        success = loadImageDXT3( image, fullpath ) &&
+                  load_texture ( image, th.tex );
+
+        delete [] image.data;
+        if (success)
+            goto loaded;
+        else
+            th.tex = 0;
+    }
+#endif
+
 #if defined(USE_PVRTC)
-    if (DirectGraphics.SupportedPVRTC)
+    if (DirectGraphics.SupportedPVRTC == true)
     {
         fullpath = path + "/tc/pvr/" + filename + ".pvr";
 
@@ -474,6 +498,74 @@ bool loadImageASTC( image_t& image, const std::string &fullpath )
 }
 #endif
 
+#if defined(USE_DXT3)
+bool loadImageDXT3( image_t& image, const std::string &fullpath )
+{
+    /*
+      00-03    Magic bytes
+             typedef struct {
+      04-07    DWORD           dwSize;
+      08-11    DWORD           dwFlags;
+      12-15    DWORD           dwHeight;
+      16-19    DWORD           dwWidth;
+      20-23    DWORD           dwPitchOrLinearSize;
+      24-27    DWORD           dwDepth;
+      28-31    DWORD           dwMipMapCount;
+      32-35    DWORD           dwReserved1[11];
+      36-67    DDS_PIXELFORMAT ddspf;
+      68-71    DWORD           dwCaps;
+      72-75    DWORD           dwCaps2;
+      76-79    DWORD           dwCaps3;
+      80-83    DWORD           dwCaps4;
+      84-87    DWORD           dwReserved2;
+             } DDS_HEADER;
+    */
+
+    uint32_t filesize;
+
+    if (fullpath.empty() || !FileExists(fullpath.c_str()))
+        return false;
+
+    image.data = LoadFileToMemory( fullpath, filesize );
+
+    if (image.data != NULL)
+    {
+        if ((image.data[0] == 'D') &&
+            (image.data[1] == 'D') &&
+            (image.data[2] == 'S') &&
+            (image.data[3] == ' ')
+           )
+        {
+            image.format        = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+            image.h             = (image.data[15]<<24)+(image.data[14]<<16)+(image.data[13]<<8)+image.data[12];
+            image.w             = (image.data[19]<<24)+(image.data[18]<<16)+(image.data[17]<<8)+image.data[16];
+            image.size          = MAX(1, ( (image.w + 3) / 4 ) ) * MAX(1, ( (image.h + 3) / 4 ) ) * 16;
+
+            image.offset        = DXT3_HEADER_SIZE;
+            image.type          = 0; /* dont care */
+            image.compressed    = true;
+
+            Protokoll.WriteText( false, "Using DXT3 (%X) ... ", image.format );
+
+#if defined(_DEBUG)
+            Protokoll.WriteText( false, "DXT3 Header %c%c%c%c\nHeight %X\nWidth %d\nSize %d\n",
+                                 image.data[0], image.data[1], image.data[2], image.data[3],
+                                 image.h, image.w, image.size );
+#endif
+            return true;
+        }
+        else
+        {
+            Protokoll.WriteText( false, "ERROR DXT3 Unknown file type %c%c%c%c\n",  image.data[0], image.data[1], image.data[2], image.data[3] );
+            delete [] image.data;
+            image.data = NULL;
+        }
+    }
+
+    return false;
+}
+#endif
+
 #if defined(USE_PVRTC)
 bool loadImagePVRTC( image_t& image, const string &fullpath )
 {
@@ -677,6 +769,8 @@ bool loadImageSDL( image_t& image, const std::string &fullpath, void *buf, unsig
         Protokoll.WriteText( true, "Error in loadImageSDL: Could not read image data into rawSurf\n" );
         return false;
     }
+
+    Protokoll.WriteText( false, "Using RGBA (SDL) ... " );
 
     return true;
 }
