@@ -3,7 +3,7 @@ uniform mat4 u_MVPMatrix;   /* A constant representing the combined model/view/p
 in vec2 a_Position;  /* Per-vertex position information - DKS: Note I changed this from 3D to 2D */
 in vec4 a_Color;     /* Per-vertex color information */
 /* Output */
-out vec4 v_Color;       /* This will be passed into the fragment shader. */
+varying out vec4 v_Color;       /* This will be passed into the fragment shader. */
 
 void main()
 {

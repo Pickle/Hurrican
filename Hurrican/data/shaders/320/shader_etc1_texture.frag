@@ -4,7 +4,7 @@ in vec2 v_Texcoord0;
 uniform sampler2D u_Texture0;
 uniform sampler2D u_Texture1;
 /* Output */
-out vec4 v_FragColor;
+varying out vec4 v_FragColor;
 
 void main()
 {    

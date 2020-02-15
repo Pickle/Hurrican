@@ -1,7 +1,7 @@
 /* Input */
 in vec4 v_Color;
 /* Output */
-out vec4 v_FragColor;
+varying out vec4 v_FragColor;
 
 void main()
 {

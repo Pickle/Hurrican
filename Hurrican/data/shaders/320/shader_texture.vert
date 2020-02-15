@@ -4,8 +4,8 @@ in vec2 a_Position;  /* Per-vertex position information - DKS: Note I changed th
 in vec4 a_Color;     /* Per-vertex color information */
 in vec2 a_Texcoord0; /* Per-vertex texcoord information */
 /* Output */
-out vec4 v_Color;       /* This will be passed into the fragment shader. */
-out vec2 v_Texcoord0;
+varying out vec4 v_Color;       /* This will be passed into the fragment shader. */
+varying out vec2 v_Texcoord0;
 
 void main()
 {
