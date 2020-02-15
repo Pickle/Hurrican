@@ -8,12 +8,12 @@
 
 powerof2 () {
   # Get the original size of the image
-  W=`identify ../$f | cut -f 3 -d " " | sed s/x.*//`
-  H=`identify ../$f | cut -f 3 -d " " | sed s/.*x//`
+  W=`identify ${f} | cut -f 3 -d " " | sed s/x.*//`
+  H=`identify ${f} | cut -f 3 -d " " | sed s/.*x//`
 
   # Determine the next power of 2 greater the original image size
-  P2W=`convert ../$f -format "%[fx:2^(ceil(log(w)/log(2)))]" info:`
-  P2H=`convert ../$f -format "%[fx:2^(ceil(log(h)/log(2)))]" info:`
+  P2W=`convert ${f} -format "%[fx:2^(ceil(log(w)/log(2)))]" info:`
+  P2H=`convert ${f} -format "%[fx:2^(ceil(log(h)/log(2)))]" info:`
   if test $P2W -lt 32; then
     P2W=32
   fi
@@ -31,35 +31,33 @@ powerof2 () {
   # Display and write the results to file
   echo Width  ${FILENAME} ${FACTOR_W} ${W} ${P2W}
   echo Height ${FILENAME} ${FACTOR_H} ${H} ${P2W}
-  echo ${FILENAME} ${FACTOR_W} ${FACTOR_H} >> scalefactors.txt
+  echo ${FILENAME} ${FACTOR_W} ${FACTOR_H} >> ${TYPE2}/scalefactors.txt
+  echo ${FILENAME} ${FACTOR_W} ${FACTOR_H} >> ${TYPE4}/scalefactors.txt
 } 
 
-rm scalefactors.txt
-rm -rf tc2
-rm -rf tc4
-#rm -rf XRGB1555
-rm -rf ../png32
+export DATA="data/textures"
+export TEX="tc"
+export TYPE2=${TEX}"/pvrtc2"
+export TYPE4=${TEX}"/pvrtc4"
+export PNG32=${TEX}"/png32"
 
-mkdir tc2
-mkdir tc4
-#mkdir XRGB1555
-mkdir ../png32
-
-cd ..
+cd ../${DATA}
+rm -rf ${TYPE2}
+rm -rf ${TYPE4}
+rm -rf ${PNG32}
+mkdir ${TEX}
+mkdir ${TYPE2}
+mkdir ${TYPE4}
+mkdir ${PNG32}
 
 for f in *.png
 do
-  cd pvr
   echo "Processing $f file..."
  
   powerof2
+  
+  convert ${f} -alpha on -extent ${P2W}x${P2H} PNG32:${PNG32}/${f}  
 
-  convert ../$f -background transparent -extent ${P2W}x${P2H} PNG32:../png32/$f.png
-
-  ./PVRTexTool -fPVRTC2 -i../png32/$f.png -o tc2/$f.pvr
-  ./PVRTexTool -fPVRTC4 -i../png32/$f.png -o tc4/$f.pvr
-#  ./PVRTexTool -f1555 -i../png32/$f.png -o XRGB1555/$f.pvr
-#  mv XRGB1555/$f.pvr XRGB1555/$f.XRGB1555
-
-  cd ..
+  ${PVRTEXTOOL}/PVRTexTool -fPVRTC2 -i${PNG32}/${f} -o ${TYPE2}/${f}.pvr
+  ${PVRTEXTOOL}/PVRTexTool -fPVRTC4 -i${PNG32}/${f} -o ${TYPE4}/${f}.pvr
 done
